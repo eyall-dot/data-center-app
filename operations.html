@@ -3,102 +3,33 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Operational Showcase — Nostromo Energy</title>
+<title>Operations — Nostromo Energy</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/main.css">
 <style>
-.shell{max-width:1440px;margin:0 auto;padding:18px clamp(14px,3vw,34px) 30px}
-
-.ohead{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap;margin-bottom:14px}
-.ohead .htitle h1{font-size:clamp(22px,3.2vw,30px);font-weight:800;letter-spacing:-.4px}
-.ohead .htitle .phase-pill{display:inline-flex;align-items:center;gap:8px;margin-top:8px;
-  font-family:var(--m);font-size:11px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;
-  padding:6px 13px;border-radius:30px;border:1px solid;transition:.4s}
-.phase-pill.charge{color:var(--cyan);border-color:rgba(6,182,212,.4);background:rgba(6,182,212,.08)}
-.phase-pill.standby{color:var(--grayL);border-color:var(--line2);background:rgba(255,255,255,.04)}
-.phase-pill.discharge{color:var(--teal);border-color:rgba(20,184,166,.4);background:rgba(20,184,166,.09)}
-.phase-pill.recover{color:var(--orange);border-color:rgba(249,115,22,.4);background:rgba(249,115,22,.08)}
-
-.stats{display:flex;gap:10px;flex-wrap:wrap}
-.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:9px 15px;min-width:92px;text-align:center}
-.stat .l{font-size:9.5px;text-transform:uppercase;letter-spacing:1.2px;color:var(--gray);font-weight:700}
-.stat .v{font-family:var(--m);font-size:25px;font-weight:700;margin-top:2px;line-height:1}
-.stat.temp{border-color:rgba(251,191,36,.32);background:linear-gradient(180deg,rgba(251,191,36,.06),var(--card))}
-.stat.temp .l{color:var(--gold)}.stat.temp .v{color:var(--gold)}
-.stat.freed{border-color:rgba(34,197,94,.32);background:linear-gradient(180deg,rgba(34,197,94,.06),var(--card))}
-.stat.freed .l{color:var(--green)}.stat.freed .v{color:var(--green)}
-
-.meterstrip{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 18px 16px;margin-bottom:14px}
-.meterstrip .mtop{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px}
-.meterstrip .mtop .lab{font-size:12px;font-weight:700;letter-spacing:.3px;color:var(--grayL)}
-.meterstrip .mtop .lab b{color:var(--white)}
-.meterstrip .mtop .cap{font-family:var(--m);font-size:12px;color:var(--red);font-weight:700}
-.bar{position:relative;height:34px;border-radius:8px;background:rgba(255,255,255,.04);overflow:visible}
-.bar .seg{position:absolute;top:0;height:100%;transition:width .25s ease,left .25s ease;display:flex;align-items:center;justify-content:center;overflow:hidden}
-.bar .seg span{font-family:var(--m);font-size:11px;font-weight:700;color:#fff;white-space:nowrap;opacity:.92;text-shadow:0 1px 2px rgba(0,0,0,.5)}
-.seg.it{background:linear-gradient(180deg,#2c3a52,#222d42);border-radius:8px 0 0 8px;left:0}
-.seg.chiller{background:linear-gradient(180deg,#ef4444,#c0392b)}
-.seg.charge{background:repeating-linear-gradient(45deg,#f97316,#f97316 6px,#d96510 6px,#d96510 12px)}
-.seg.freed{background:linear-gradient(180deg,rgba(34,197,94,.32),rgba(34,197,94,.16));border:1px dashed rgba(34,197,94,.6);border-radius:0 8px 8px 0}
-.seg.freed span{color:var(--green)}
-.bar .capline{position:absolute;top:-6px;bottom:-6px;width:3px;background:var(--red);box-shadow:0 0 8px rgba(239,68,68,.7);z-index:5}
-.bar .nostore{position:absolute;top:-9px;bottom:-9px;width:0;border-left:2px dashed rgba(239,68,68,.9);z-index:6;transition:left .25s,opacity .3s}
-.bar .nostore::after{content:"◄ without storage";position:absolute;top:-22px;left:-86px;font-family:var(--m);
-  font-size:9.5px;color:#fca5a5;white-space:nowrap}
-.mlegend{display:flex;gap:18px;margin-top:18px;flex-wrap:wrap}
-.mlegend span{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--grayL)}
-.mlegend i{width:13px;height:13px;border-radius:3px;display:inline-block}
-
-.stage{background:linear-gradient(180deg,var(--card),var(--bg2));border:1px solid var(--line);border-radius:16px;padding:8px;position:relative;overflow:hidden}
-.stage svg{display:block;width:100%;height:auto}
-
-.controls{display:flex;align-items:center;gap:12px;margin-top:14px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 15px}
-.pbtn{width:46px;height:46px;border-radius:11px;border:none;cursor:pointer;flex-shrink:0;background:var(--teal);color:var(--bg);
-  font-size:19px;display:flex;align-items:center;justify-content:center;transition:.2s}
-.pbtn:hover{filter:brightness(1.1);transform:translateY(-1px)}
-.tlwrap{flex:1;min-width:0}
-.tlbg{height:7px;background:rgba(255,255,255,.07);border-radius:4px;cursor:pointer;position:relative}
-.tlfill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--cyan),var(--blue),var(--gold),var(--red),var(--orange),var(--cyan));width:0}
-.tlhr{display:flex;justify-content:space-between;margin-top:4px}
-.tlhr span{font-family:var(--m);font-size:9px;color:var(--gray)}
-.spd{display:flex;gap:4px;flex-shrink:0}
-.spd button{padding:6px 9px;border-radius:7px;border:1px solid var(--line2);background:transparent;color:var(--gray);
-  font-family:var(--m);font-size:11px;cursor:pointer;transition:.2s}
-.spd button.on{background:rgba(20,184,166,.15);border-color:var(--teal);color:var(--teal)}
-
-.legend-stage{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;justify-content:center}
-.legend-stage span{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--grayL)}
-.legend-stage i{width:18px;height:4px;border-radius:2px;display:inline-block}
-
-.pipe{fill:none;stroke-width:6;stroke-linecap:round;stroke-dasharray:12 9;opacity:.16;transition:opacity .45s,stroke-width .45s}
-.pipe.gridpipe{stroke-width:3;stroke-dasharray:7 7}
-.pipe.on{opacity:1;animation:dashmv .7s linear infinite}
-.pipe.on.rev{animation:dashmv .7s linear infinite reverse}
-.pipe.gridon{opacity:.6;animation:dashmv 1s linear infinite}
-@keyframes dashmv{to{stroke-dashoffset:-40}}
-.cu rect{fill:#16223a;stroke:#26334d;stroke-width:1.5;transition:.4s}
-.cu .fan{fill:none;stroke:#33415a;stroke-width:2;transition:.4s;transform-box:fill-box;transform-origin:center}
-.cu.on rect{fill:rgba(20,184,166,.16);stroke:#14B8A6}
-.cu.on .fan{stroke:#5eead4;animation:spin 1.1s linear infinite}
-.cu.charging rect{fill:rgba(59,130,246,.18);stroke:#3B82F6}
-.cu.charging .fan{stroke:#93c5fd;animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.chip{transition:fill .4s,opacity .4s}
-.heatwave{animation:rise 2.4s ease-in infinite;opacity:0}
-@keyframes rise{0%{opacity:.5;transform:translateY(0)}100%{opacity:0;transform:translateY(-26px)}}
-
-/* port indicators */
-.port{fill:#1e2d42;stroke:#3B82F6;stroke-width:1}
-/* pipe label */
-.plabel{font-family:'JetBrains Mono',monospace;font-size:9px;fill:#475569}
-
-/* trigger section */
-.trigger-section{margin:14px 0;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 18px 10px}
-.trigger-header{display:flex;align-items:baseline;gap:14px;margin-bottom:10px}
-.trigger-title{font-size:14px;font-weight:700;letter-spacing:.2px}
-.trigger-sub{font-size:12px;color:var(--gray);font-family:var(--m)}
-.trig-stage svg{display:block;width:100%;height:auto}
+html,body{height:100%;overflow:hidden;background:#0d1117}
+body{display:flex;flex-direction:column}
+#ctrlbar{height:38px;background:#080c14;border-bottom:1px solid #14213a;
+  display:flex;align-items:center;gap:10px;padding:0 14px;flex-shrink:0}
+#ctr{flex:1;position:relative;overflow:hidden;min-height:0}
+#cv{display:block}
+.tl{font-size:9px;font-weight:700;letter-spacing:.1em;color:#2a3d5c;text-transform:uppercase;white-space:nowrap}
+.scrubwrap{flex:1;display:flex;align-items:center;gap:7px;max-width:400px}
+.scrubwrap .ph{font-size:8px;color:#2a3d5c;font-family:'Courier New',monospace}
+input[type=range]{width:100%;-webkit-appearance:none;height:3px;border-radius:2px;background:#14213a;outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:10px;height:10px;border-radius:50%;background:#a78bfa;border:2px solid #080c14}
+#clock{font-size:14px;font-weight:700;color:#38bdf8;font-family:'Courier New',monospace}
+#badge{padding:2px 10px;border-radius:10px;font-size:8.5px;font-weight:700;letter-spacing:.08em;background:#0d1117;border:1px solid #14213a;color:#14213a;transition:all .3s;white-space:nowrap}
+.tbtn{padding:3px 9px;background:#0b1424;border:1px solid #1e3050;border-radius:4px;color:#5b7bb8;font-size:9px;font-weight:700;cursor:pointer}
+.tbtn:hover{background:#13203a}
+#playbtn{padding:3px 13px;background:#0b1e38;border:1px solid #1d4ed8;border-radius:4px;color:#60a5fa;font-size:9.5px;font-weight:700;cursor:pointer}
+#playbtn:hover{background:#152d52}
+#scenebar{height:32px;background:#080c14;border-top:1px solid #14213a;
+  display:flex;align-items:center;gap:8px;padding:0 14px;flex-shrink:0}
+.scl{font-size:8px;color:#2a3d5c;font-family:'Courier New',monospace;white-space:nowrap}
+.scv{font-size:9px;font-weight:700;color:#38bdf8;font-family:'Courier New',monospace;white-space:nowrap;min-width:52px}
+#scenebar input{width:100px;margin:0}
 </style>
 </head>
 <body>
@@ -112,731 +43,907 @@
   </div>
 </nav>
 
-<div class="shell">
-
-  <div class="ohead">
-    <div class="htitle">
-      <h1>A Design Day, End to End</h1>
-      <div class="phase-pill standby" id="phasePill">● Standby</div>
-    </div>
-    <div class="stats">
-      <div class="stat"><div class="l">Time</div><div class="v" id="stTime" style="color:var(--blue)">00:00</div></div>
-      <div class="stat temp"><div class="l">Outside</div><div class="v" id="stTemp">66°</div></div>
-      <div class="stat"><div class="l">Main Meter</div><div class="v" id="stMeter" style="color:var(--white)">— </div></div>
-      <div class="stat freed"><div class="l">Freed kW</div><div class="v" id="stFreed">0.0</div></div>
-    </div>
+<div id="ctrlbar">
+  <span class="tl">P&amp;ID</span>
+  <div class="scrubwrap">
+    <span class="ph">00:00</span>
+    <input type="range" id="scrub" min="0" max="9999" value="0"/>
+    <span class="ph">24:00</span>
   </div>
-
-  <div class="meterstrip">
-    <div class="mtop">
-      <div class="lab">Power at the <b>main meter</b> &mdash; IT compute + cooling, measured against the site cap</div>
-      <div class="cap" id="capLab">CAP 32.0 MW</div>
-    </div>
-    <div class="bar" id="bar">
-      <div class="seg it" id="segIT"><span>IT 20 MW</span></div>
-      <div class="seg chiller" id="segChill"><span id="segChillTxt"></span></div>
-      <div class="seg charge" id="segCharge"><span id="segChargeTxt"></span></div>
-      <div class="seg freed" id="segFreed"><span id="segFreedTxt"></span></div>
-      <div class="capline" id="capLine"></div>
-      <div class="nostore" id="noStore" style="opacity:0"></div>
-    </div>
-    <div class="mlegend">
-      <span><i style="background:#2c3a52"></i>IT / compute load</span>
-      <span><i style="background:#ef4444"></i>Chiller draw</span>
-      <span><i style="background:repeating-linear-gradient(45deg,#f97316,#f97316 4px,#d96510 4px,#d96510 8px)"></i>Charging the store</span>
-      <span><i style="background:rgba(34,197,94,.4);border:1px dashed rgba(34,197,94,.7)"></i>Freed for compute</span>
-    </div>
-  </div>
-
-  <div class="stage">
-    <svg id="scene" viewBox="0 0 1300 760" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <filter id="soft" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
-        <linearGradient id="gTeal" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stop-color="#14B8A6"/><stop offset="1" stop-color="#06B6D4"/>
-        </linearGradient>
-        <linearGradient id="gTealV" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#14B8A6"/><stop offset="1" stop-color="#06B6D4"/>
-        </linearGradient>
-        <linearGradient id="gWarm" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stop-color="#F97316"/><stop offset="1" stop-color="#EF4444"/>
-        </linearGradient>
-        <linearGradient id="gWarmV" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#F97316"/><stop offset="1" stop-color="#EF4444"/>
-        </linearGradient>
-        <linearGradient id="gIce" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#14B8A6"/>
-        </linearGradient>
-        <linearGradient id="gGrid" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stop-color="#3B82F6"/><stop offset="1" stop-color="#60a5fa"/>
-        </linearGradient>
-        <radialGradient id="gSun">
-          <stop offset="0" stop-color="#FBBF24" stop-opacity="1"/><stop offset="1" stop-color="#FBBF24" stop-opacity="0"/>
-        </radialGradient>
-        <clipPath id="tankClip"><rect x="32" y="330" width="300" height="252" rx="6"/></clipPath>
-      </defs>
-
-      <!-- ====================== TOP SECTION: MAIN METER + SUN ====================== -->
-
-      <!-- Main Meter box -->
-      <rect x="480" y="10" width="340" height="68" rx="12" fill="#0d1830" stroke="#3B82F6" stroke-width="2"/>
-      <text x="650" y="36" text-anchor="middle" font-family="Outfit,sans-serif" font-size="14" font-weight="800" fill="#93c5fd">MAIN METER</text>
-      <text x="650" y="54" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#475569">site power · 32 MW cap</text>
-      <rect x="492" y="72" width="316" height="4" rx="2" fill="url(#gTeal)" opacity="0.3"/>
-
-      <!-- Sun / ambient temperature indicator -->
-      <circle id="sunGlow" cx="1225" cy="52" r="55" fill="url(#gSun)" opacity="0.2"/>
-      <circle id="sunCore" cx="1225" cy="52" r="18" fill="#FBBF24" opacity="0.3"/>
-      <text id="sunTemp" x="1225" y="102" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" fill="#FBBF24" opacity="0.85">66°F</text>
-
-      <!-- Grid power trunk left: Main Meter → Nostromo (CHARGING ONLY) -->
-      <path id="p_gridCharge" class="pipe gridpipe" d="M480 75 H182 V162" stroke="#3B82F6"/>
-      <!-- Grid power trunk right: Main Meter → DC (ALWAYS ON) -->
-      <path id="p_gridDC" class="pipe gridpipe" d="M820 75 H1080 V162" stroke="#3B82F6"/>
-
-      <!-- ====================== ZONE BACKGROUNDS ====================== -->
-
-      <!-- Nostromo zone -->
-      <rect x="8" y="96" width="453" height="654" rx="16" fill="rgba(20,184,166,.025)" stroke="rgba(20,184,166,.35)" stroke-width="1.5"/>
-      <!-- DC zone -->
-      <rect x="530" y="96" width="762" height="654" rx="16" fill="rgba(59,130,246,.015)" stroke="rgba(100,116,139,.25)" stroke-width="1.5"/>
-
-      <!-- ====================== ZONE STATUS HEADERS ====================== -->
-
-      <!-- Nostromo zone label -->
-      <text x="234" y="116" text-anchor="middle" font-family="Outfit,sans-serif" font-size="11" font-weight="700" fill="#14B8A6" letter-spacing="2">NOSTROMO ICEBRICK SYSTEM</text>
-
-      <!-- Nostromo status chips -->
-      <g id="nosStatus">
-        <rect x="22" y="124" width="132" height="26" rx="13" fill="rgba(20,184,166,.12)" stroke="rgba(20,184,166,.4)" stroke-width="1"/>
-        <text id="nosPhaseText" x="88" y="141" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" font-weight="700" fill="#14B8A6">● STANDBY</text>
-        <rect x="160" y="124" width="90" height="26" rx="13" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
-        <text x="175" y="136" font-family="Outfit,sans-serif" font-size="8" fill="#64748b" letter-spacing="1">SOC</text>
-        <text id="nosSoc" x="245" y="141" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="12" font-weight="700" fill="#22d3ee">62%</text>
-        <rect x="256" y="124" width="110" height="26" rx="13" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
-        <text x="271" y="136" font-family="Outfit,sans-serif" font-size="8" fill="#64748b" letter-spacing="1">STORE</text>
-        <text id="nosKw" x="362" y="141" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="12" font-weight="700" fill="#22d3ee">0.0 kW</text>
-      </g>
-
-      <!-- DC zone label -->
-      <text x="911" y="116" text-anchor="middle" font-family="Outfit,sans-serif" font-size="11" font-weight="700" fill="#94A3B8" letter-spacing="2">DATA CENTRE</text>
-
-      <!-- DC status chips -->
-      <g id="dcStatus">
-        <rect x="538" y="124" width="148" height="26" rx="13" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
-        <text x="553" y="136" font-family="Outfit,sans-serif" font-size="8" fill="#64748b" letter-spacing="1">IT LOAD</text>
-        <text id="dcItLoad" x="682" y="141" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="12" font-weight="700" fill="#93c5fd">20.0 MW</text>
-        <rect x="692" y="124" width="148" height="26" rx="13" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
-        <text x="707" y="136" font-family="Outfit,sans-serif" font-size="8" fill="#64748b" letter-spacing="1">CHILLERS</text>
-        <text id="dcChillKw" x="836" y="141" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="12" font-weight="700" fill="#f97316">8.0 MW</text>
-        <rect x="846" y="124" width="110" height="26" rx="13" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
-        <text x="861" y="136" font-family="Outfit,sans-serif" font-size="8" fill="#64748b" letter-spacing="1">PUE</text>
-        <text id="dcPue" x="952" y="141" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="12" font-weight="700" fill="#a78bfa">1.40</text>
-      </g>
-
-      <!-- ====================== NOSTROMO CHILLER BOX ====================== -->
-      <rect x="22" y="162" width="320" height="118" rx="10" fill="#0c1624" stroke="#2b3a55" stroke-width="1.5"/>
-      <text x="182" y="180" text-anchor="middle" font-family="Outfit,sans-serif" font-size="12" font-weight="800" fill="#cbd5e1">NOSTROMO CHILLER</text>
-
-      <!-- Nostromo chiller CU units (3) -->
-      <g id="nchillers">
-        <g class="cu" data-i="0">
-          <rect x="32" y="188" width="94" height="56" rx="7"/>
-          <circle class="fan" cx="79" cy="216" r="17"/>
-        </g>
-        <g class="cu" data-i="1">
-          <rect x="136" y="188" width="94" height="56" rx="7"/>
-          <circle class="fan" cx="183" cy="216" r="17"/>
-        </g>
-        <g class="cu" data-i="2">
-          <rect x="240" y="188" width="94" height="56" rx="7"/>
-          <circle class="fan" cx="287" cy="216" r="17"/>
-        </g>
-      </g>
-
-      <!-- Nostromo chiller port indicators -->
-      <!-- Chiller bottom-left port: cold supply out to IceBricks during charge -->
-      <circle class="port" cx="60" cy="280" r="4"/>
-      <!-- Chiller bottom-right port: warm return from IceBricks during charge -->
-      <circle class="port" cx="310" cy="280" r="4"/>
-      <!-- Chiller top-center port: grid power in -->
-      <circle class="port" cx="182" cy="162" r="4"/>
-
-      <!-- ====================== ICEBRICKS TANK ====================== -->
-      <rect x="22" y="318" width="320" height="272" rx="10" fill="#0c1624" stroke="#2b3a55" stroke-width="2"/>
-      <text x="182" y="340" text-anchor="middle" font-family="Outfit,sans-serif" font-size="14" font-weight="800" fill="#5eead4">ICEBRICKS</text>
-
-      <!-- SOC fill (clipped) -->
-      <g clip-path="url(#tankClip)">
-        <rect id="socFill" x="32" y="450" width="300" height="132" fill="url(#gIce)" opacity="0.55"/>
-        <rect id="socShine" x="32" y="448" width="300" height="4" fill="#a5f3fc" opacity="0.6"/>
-        <!-- Ice grid lines -->
-        <g stroke="#0d1626" stroke-width="1.5" opacity="0.35">
-          <line x1="32" y1="342" x2="322" y2="342"/>
-          <line x1="32" y1="372" x2="322" y2="372"/>
-          <line x1="32" y1="402" x2="322" y2="402"/>
-          <line x1="32" y1="432" x2="322" y2="432"/>
-          <line x1="32" y1="462" x2="322" y2="462"/>
-          <line x1="32" y1="492" x2="322" y2="492"/>
-          <line x1="32" y1="522" x2="322" y2="522"/>
-          <line x1="32" y1="552" x2="322" y2="552"/>
-          <line x1="92" y1="330" x2="92" y2="582"/>
-          <line x1="152" y1="330" x2="152" y2="582"/>
-          <line x1="212" y1="330" x2="212" y2="582"/>
-          <line x1="272" y1="330" x2="272" y2="582"/>
-        </g>
-      </g>
-
-      <text id="socPct" x="182" y="430" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="36" font-weight="700" fill="#ffffff">62%</text>
-      <text x="182" y="454" text-anchor="middle" font-family="Outfit,sans-serif" font-size="9" fill="#94a3b8" letter-spacing="1.2">STATE OF CHARGE</text>
-      <text id="storeLabel" x="182" y="572" text-anchor="middle" font-family="Outfit,sans-serif" font-size="11" fill="#64748b">thermal store</text>
-
-      <!-- IceBricks port indicators -->
-      <!-- Top-left: cold in from chiller during charge -->
-      <circle class="port" cx="60" cy="318" r="4"/>
-      <!-- Top-right: warm out to chiller during charge -->
-      <circle class="port" cx="310" cy="318" r="4"/>
-      <!-- Right mid-upper: cold out to HX during discharge -->
-      <circle class="port" cx="342" cy="415" r="4" fill="#1e2d42" stroke="#14B8A6" stroke-width="1"/>
-      <!-- Right mid-lower: warm in from HX during discharge -->
-      <circle class="port" cx="342" cy="455" r="4" fill="#1e2d42" stroke="#F97316" stroke-width="1"/>
-
-      <!-- ====================== NOSTROMO PIPE ROUTES ====================== -->
-
-      <!-- CHARGE LOOP: chiller cold supply → IceBricks (going down) -->
-      <path id="p_nFreezeL" class="pipe" d="M60 280 V318" stroke="url(#gTealV)"/>
-      <!-- CHARGE LOOP: IceBricks warm return → chiller (going up) -->
-      <path id="p_nFreezeR" class="pipe rev" d="M310 318 V280" stroke="url(#gWarmV)"/>
-
-      <!-- DISCHARGE: IceBricks cold out → HX left cold in -->
-      <path id="p_iceHX" class="pipe" d="M342 415 H443" stroke="url(#gTeal)"/>
-      <!-- DISCHARGE: HX warm out → up right column → into Nostromo chiller -->
-      <path id="p_hxNos" class="pipe rev" d="M443 440 H390 V212 H342" stroke="url(#gWarm)"/>
-
-      <!-- ====================== HEAT EXCHANGER (spans zone boundary) ====================== -->
-      <rect x="443" y="258" width="82" height="220" rx="10" fill="#0c1624" stroke="#3B82F6" stroke-width="2"/>
-      <text x="484" y="278" text-anchor="middle" font-family="Outfit,sans-serif" font-size="11" font-weight="800" fill="#93c5fd">HX</text>
-      <text x="484" y="291" text-anchor="middle" font-family="Outfit,sans-serif" font-size="8" fill="#475569">HEAT EXCHANGER</text>
-
-      <!-- HX coil lines alternating teal/orange -->
-      <g stroke-width="2.5" fill="none" stroke-linecap="round">
-        <path d="M455 310 H513" stroke="#14B8A6"/>
-        <path d="M455 330 H513" stroke="#F97316"/>
-        <path d="M455 350 H513" stroke="#14B8A6"/>
-        <path d="M455 370 H513" stroke="#F97316"/>
-        <path d="M455 390 H513" stroke="#14B8A6"/>
-        <path d="M455 410 H513" stroke="#F97316"/>
-        <path d="M455 430 H513" stroke="#14B8A6"/>
-      </g>
-
-      <text x="441" y="295" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="8" fill="#64748b">← NOS</text>
-      <text x="527" y="295" font-family="JetBrains Mono,monospace" font-size="8" fill="#64748b">BLD →</text>
-
-      <!-- HX port indicators -->
-      <!-- Left cold in: IceBricks → HX during discharge -->
-      <circle class="port" cx="443" cy="400" r="4" fill="#1e2d42" stroke="#14B8A6" stroke-width="1"/>
-      <!-- Left warm out: HX → Nostromo system -->
-      <circle class="port" cx="443" cy="440" r="4" fill="#1e2d42" stroke="#F97316" stroke-width="1"/>
-      <!-- Right warm in: building warm return enters HX -->
-      <circle class="port" cx="525" cy="350" r="4" fill="#1e2d42" stroke="#F97316" stroke-width="1"/>
-      <!-- Right cold out: cooled water exits to building loop -->
-      <circle class="port" cx="525" cy="420" r="4" fill="#1e2d42" stroke="#14B8A6" stroke-width="1"/>
-
-      <!-- ====================== DC CHILLER PLANT ====================== -->
-      <rect x="548" y="162" width="400" height="134" rx="10" fill="#0c1624" stroke="#2b3a55" stroke-width="1.5"/>
-      <text x="748" y="182" text-anchor="middle" font-family="Outfit,sans-serif" font-size="13" font-weight="800" fill="#cbd5e1">CHILLER PLANT</text>
-
-      <!-- DC Chiller CU units (6) — 2 rows of 3 -->
-      <g id="chillers">
-        <!-- Row 1 -->
-        <g class="cu" data-i="0">
-          <rect x="558" y="192" width="100" height="50" rx="7"/>
-          <circle class="fan" cx="608" cy="217" r="15"/>
-        </g>
-        <g class="cu" data-i="1">
-          <rect x="668" y="192" width="100" height="50" rx="7"/>
-          <circle class="fan" cx="718" cy="217" r="15"/>
-        </g>
-        <g class="cu" data-i="2">
-          <rect x="778" y="192" width="100" height="50" rx="7"/>
-          <circle class="fan" cx="828" cy="217" r="15"/>
-        </g>
-        <!-- Row 2 -->
-        <g class="cu" data-i="3">
-          <rect x="558" y="250" width="100" height="50" rx="7"/>
-          <circle class="fan" cx="608" cy="275" r="15"/>
-        </g>
-        <g class="cu" data-i="4">
-          <rect x="668" y="250" width="100" height="50" rx="7"/>
-          <circle class="fan" cx="718" cy="275" r="15"/>
-        </g>
-        <g class="cu" data-i="5">
-          <rect x="778" y="250" width="100" height="50" rx="7"/>
-          <circle class="fan" cx="828" cy="275" r="15"/>
-        </g>
-      </g>
-
-      <!-- Chiller plant port indicators -->
-      <circle class="port" cx="580" cy="296" r="4"/>
-      <circle class="port" cx="928" cy="296" r="4"/>
-
-      <!-- ====================== DC BUILDING LOOP PIPES ====================== -->
-
-      <!-- Building chilled water supply: Chiller Plant bottom → CDU top, left trunk -->
-      <path id="p_bldCold" class="pipe" d="M580 296 V354" stroke="url(#gTealV)"/>
-      <!-- Building warm return: CDU top → Chiller Plant bottom, right trunk -->
-      <path id="p_bldWarm" class="pipe rev" d="M928 354 V296" stroke="url(#gWarmV)"/>
-
-      <!-- HX building interface: cold out of HX right → CDU top (active during discharge) -->
-      <path id="p_hxBldCold" class="pipe" d="M525 420 H548 V354" stroke="url(#gTealV)"/>
-      <!-- HX building interface: warm return branches to HX right warm in (active during discharge) -->
-      <path id="p_hxBldWarm" class="pipe rev" d="M928 302 H525 V350" stroke="url(#gWarmV)"/>
-
-      <!-- ====================== CDU BOX ====================== -->
-      <rect x="548" y="354" width="400" height="88" rx="10" fill="#0c1624" stroke="#26334d" stroke-width="1.5"/>
-      <text x="748" y="388" text-anchor="middle" font-family="Outfit,sans-serif" font-size="13" font-weight="800" fill="#cbd5e1">DLC / CDU</text>
-      <text x="748" y="406" text-anchor="middle" font-family="Outfit,sans-serif" font-size="9" fill="#475569">Coolant Distribution Unit · direct liquid loop</text>
-      <path d="M575 420 H908" stroke="#14B8A6" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.35"/>
-      <text x="580" y="432" font-family="Outfit,sans-serif" font-size="9" fill="#14B8A6" opacity="0.5">cold →</text>
-      <text x="900" y="432" text-anchor="end" font-family="Outfit,sans-serif" font-size="9" fill="#F97316" opacity="0.5">← warm</text>
-
-      <!-- CDU port indicators -->
-      <circle class="port" cx="580" cy="354" r="4"/>
-      <circle class="port" cx="928" cy="354" r="4"/>
-      <circle class="port" cx="750" cy="442" r="4"/>
-
-      <!-- DLC secondary: CDU bottom → Servers top (cold coolant) -->
-      <path id="p_cduSrv" class="pipe" d="M750 442 V482" stroke="url(#gTealV)"/>
-      <!-- DLC secondary: Servers top → CDU bottom (warm coolant return) -->
-      <path id="p_srvCdu" class="pipe rev" d="M820 482 V442" stroke="url(#gWarmV)"/>
-
-      <!-- ====================== SERVERS / RACKS ====================== -->
-      <rect x="490" y="482" width="550" height="192" rx="10" fill="#0c1624" stroke="#2b3a55" stroke-width="1.5"/>
-      <text x="765" y="500" text-anchor="middle" font-family="Outfit,sans-serif" font-size="13" font-weight="800" fill="#cbd5e1">SERVERS / CHIPS</text>
-      <text id="dcLoad" x="765" y="516" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#64748b">IT load 20.0 MW</text>
-
-      <!-- Server port indicators -->
-      <circle class="port" cx="660" cy="482" r="4"/>
-      <circle class="port" cx="820" cy="482" r="4"/>
-
-      <!-- Rack groups -->
-      <rect x="504" y="528" width="148" height="134" rx="7" fill="#101a2e" stroke="#26334d"/>
-      <rect x="660" y="528" width="148" height="134" rx="7" fill="#101a2e" stroke="#26334d"/>
-      <rect x="816" y="528" width="148" height="134" rx="7" fill="#101a2e" stroke="#26334d"/>
-
-      <!-- Chips built by JS -->
-      <g id="chips"></g>
-      <!-- Heat waves built by JS -->
-      <g id="hwaves"></g>
-
-    </svg>
-
-    <div class="legend-stage">
-      <span><i style="background:linear-gradient(90deg,#14B8A6,#06B6D4)"></i>cold flow (teal)</span>
-      <span><i style="background:linear-gradient(90deg,#F97316,#EF4444)"></i>warm return</span>
-      <span><i style="background:#3B82F6"></i>grid power</span>
-      <span><i style="background:rgba(20,184,166,.35);border:1px solid #14B8A6"></i>Nostromo loop (discharge)</span>
-      <span><i style="background:rgba(59,130,246,.35);border:1px solid #3B82F6"></i>building water loop</span>
-    </div>
-  </div>
-
-  <!-- ====================== TRIGGER GRAPH SECTION ====================== -->
-  <div class="trigger-section">
-    <div class="trigger-header">
-      <span class="trigger-title">Operation Triggers</span>
-      <span class="trigger-sub">when and why the IceBrick system activates</span>
-    </div>
-    <div class="trig-stage">
-      <svg id="trigSvg" viewBox="0 0 1300 230" xmlns="http://www.w3.org/2000/svg">
-        <!-- drawn by JS -->
-      </svg>
-    </div>
-  </div>
-
-  <div class="controls">
-    <button class="pbtn" id="play">▶</button>
-    <div class="tlwrap">
-      <div class="tlbg" id="tlbg"><div class="tlfill" id="tlfill"></div></div>
-      <div class="tlhr"><span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>24:00</span></div>
-    </div>
-    <div class="spd">
-      <button id="s1">1×</button><button class="on" id="s2">2×</button><button id="s4">4×</button>
-    </div>
-  </div>
-
+  <span id="clock">00:00</span>
+  <span id="badge">STANDBY</span>
+  <button class="tbtn" id="s1btn">1×</button>
+  <button class="tbtn" id="s2btn" style="color:#a78bfa;border-color:#3b2a6a">2×</button>
+  <button class="tbtn" id="s4btn">4×</button>
+  <button id="playbtn">&#9654; PLAY</button>
 </div>
 
-<div class="footer"><b>Nostromo Energy</b> — operational showcase · illustrative design-day model</div>
+<div id="ctr">
+  <canvas id="cv"></canvas>
+</div>
+
+<div id="scenebar">
+  <span class="scl">IT Load</span>
+  <input type="range" id="si" min="18" max="22" step="0.1" value="20"/>
+  <span id="li" class="scv">20.0 MW</span>
+  <span class="scl" style="margin-left:18px">Ambient Peak</span>
+  <input type="range" id="sa" min="68" max="105" step="1" value="88"/>
+  <span id="la" class="scv">88°F</span>
+</div>
 
 <script>
-document.addEventListener('DOMContentLoaded',function(){
-  var CAP=32, IT=20, BUF=0.6, MAXCH=12, OFFMAX=7;
-  var $=function(id){return document.getElementById(id)};
+(function(){
+'use strict';
 
-  function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
-  function temp(h){
-    var hh=h;
-    if(hh<5) hh+=24;
-    var x=(hh-5)/24;
-    var peakx=0.458, w=0.62;
-    var base=64, amp=31;
-    var v=Math.cos((x-peakx)/w*Math.PI); v=(v+1)/2;
-    return base+amp*Math.pow(v,1.1);
+// ── constants ────────────────────────────────────────────────
+const CAP=32, IT_DEFAULT=20;
+var itLoad=IT_DEFAULT;
+var ambientPeak=88; // adjustable
+
+// virtual coordinate system
+const VW=920, VH=548;
+
+var cv=document.getElementById('cv');
+var cx=cv.getContext('2d');
+
+// ── resize ───────────────────────────────────────────────────
+function resize(){
+  var ctr=document.getElementById('ctr');
+  cv.width=ctr.clientWidth;
+  cv.height=ctr.clientHeight;
+}
+resize();
+window.addEventListener('resize',resize);
+
+function sc(){
+  var s=Math.min(cv.width/VW,cv.height/VH);
+  return {s:s,ox:(cv.width-VW*s)/2,oy:(cv.height-VH*s)/2};
+}
+function X(x){var r=sc();return r.ox+x*r.s;}
+function Y(y){var r=sc();return r.oy+y*r.s;}
+function D(v){return sc().s*v;}
+
+// ── simulation math ──────────────────────────────────────────
+function temp(h){
+  var hh=h;
+  if(hh<5) hh+=24;
+  var x=(hh-5)/24;
+  var peakx=0.458, w=0.62;
+  var base=64, amp=ambientPeak-64;
+  var v=Math.cos((x-peakx)/w*Math.PI); v=(v+1)/2;
+  return base+amp*Math.pow(v,1.1);
+}
+function soc(h){
+  if(h>=22) return Math.max(0,Math.min(1,0.10+(h-22)/10*0.90));
+  if(h<8)   return Math.max(0,Math.min(1,0.10+(h+2)/10*0.90));
+  if(h<12)  return 1;
+  if(h<20)  return Math.max(0.12,Math.min(1,1-(h-12)/8*0.88));
+  return 0.12;
+}
+function isCharge(h){return h>=22||h<8;}
+function isDischarge(h){return h>=12&&h<20;}
+function state(h){
+  var T=temp(h);
+  var coolFrac=Math.max(0,Math.min(1,(T-60)/(98-60)));
+  var chRaw=4+8*coolFrac;
+  var s=soc(h), charging=isCharge(h), discharging=isDischarge(h);
+  var pacing=Math.min(1,s/0.15);
+  var off=discharging?Math.min(chRaw-2.5,7)*pacing:0;
+  var chEff=Math.max(2,chRaw-off);
+  var chargeKW=0;
+  if(charging){var headroom=CAP-0.6-(itLoad+chRaw);chargeKW=Math.max(0,Math.min(3.6,headroom));}
+  var meter=itLoad+chEff+chargeKW;
+  var freed=Math.max(0,CAP-meter);
+  var nRun=Math.max(2,Math.round(chEff/12*8));
+  var nRel=discharging?Math.round(off/12*8):0;
+  var phase=charging?'charge':discharging?'discharge':(h>=8&&h<12?'standby':'recover');
+  return {h:h,T:T,coolFrac:coolFrac,soc:s,charging:charging,discharging:discharging,
+    chRaw:chRaw,chEff:chEff,chargeKW:chargeKW,meter:meter,freed:freed,off:off,
+    nRun:nRun,nRel:nRel,phase:phase,chillFrac:Math.min(1,chEff/12)};
+}
+
+// ── color palette ─────────────────────────────────────────────
+var C={sup:'#38bdf8',pre:'#7dd3fc',ret:'#f87171',cold:'#34d399',mix:'#22d3ee',
+       warm:'#fbbf24',chg:'#60a5fa',cmd:'#a78bfa',plate:'#a5b4fc'};
+
+// ── draw utilities ────────────────────────────────────────────
+function rr(x,y,w,h,r,fill,stroke,lw){
+  cx.beginPath();
+  cx.moveTo(X(x+r),Y(y));
+  cx.lineTo(X(x+w-r),Y(y));
+  cx.quadraticCurveTo(X(x+w),Y(y),X(x+w),Y(y+r));
+  cx.lineTo(X(x+w),Y(y+h-r));
+  cx.quadraticCurveTo(X(x+w),Y(y+h),X(x+w-r),Y(y+h));
+  cx.lineTo(X(x+r),Y(y+h));
+  cx.quadraticCurveTo(X(x),Y(y+h),X(x),Y(y+h-r));
+  cx.lineTo(X(x),Y(y+r));
+  cx.quadraticCurveTo(X(x),Y(y),X(x+r),Y(y));
+  cx.closePath();
+  if(fill){cx.fillStyle=fill;cx.fill();}
+  if(stroke){cx.strokeStyle=stroke;cx.lineWidth=D(lw||1);cx.setLineDash([]);cx.stroke();}
+}
+
+function t(s,x,y,col,sz,w,a){
+  cx.save();
+  cx.fillStyle=col||'#fff';
+  cx.font=(w||'400')+' '+D(sz||9)+'px "Courier New",monospace';
+  cx.textAlign=a||'center';
+  cx.textBaseline='middle';
+  cx.fillText(s,X(x),Y(y));
+  cx.restore();
+}
+
+function glow(x,y,r,col,a){
+  cx.save();
+  var g=cx.createRadialGradient(X(x),Y(y),0,X(x),Y(y),D(r));
+  g.addColorStop(0,col.replace('rgb','rgba').replace(')',','+(a||0.3)+')').replace('rgba(rgba','rgba('));
+  // simple approach: parse and add alpha
+  var ga=cx.createRadialGradient(X(x),Y(y),0,X(x),Y(y),D(r));
+  ga.addColorStop(0,colA(col,a||0.3));
+  ga.addColorStop(1,colA(col,0));
+  cx.fillStyle=ga;
+  cx.beginPath();
+  cx.arc(X(x),Y(y),D(r),0,Math.PI*2);
+  cx.fill();
+  cx.restore();
+}
+
+function colA(hex,alpha){
+  // convert hex to rgba
+  var r=parseInt(hex.slice(1,3),16),
+      g=parseInt(hex.slice(3,5),16),
+      b=parseInt(hex.slice(5,7),16);
+  return 'rgba('+r+','+g+','+b+','+alpha+')';
+}
+
+function lerpHex(c1,c2,t2){
+  var r1=parseInt(c1.slice(1,3),16), g1=parseInt(c1.slice(3,5),16), b1=parseInt(c1.slice(5,7),16);
+  var r2=parseInt(c2.slice(1,3),16), g2=parseInt(c2.slice(3,5),16), b2=parseInt(c2.slice(5,7),16);
+  var r=Math.round(r1+(r2-r1)*t2), g=Math.round(g1+(g2-g1)*t2), b=Math.round(b1+(b2-b1)*t2);
+  return '#'+r.toString(16).padStart(2,'0')+g.toString(16).padStart(2,'0')+b.toString(16).padStart(2,'0');
+}
+
+function pipe(pts,col,lw,off,alpha){
+  if(pts.length<2) return;
+  cx.save();
+  cx.globalAlpha=alpha||1;
+  cx.strokeStyle=col;
+  cx.lineWidth=D(lw||4);
+  cx.lineCap='round';
+  cx.lineJoin='round';
+  cx.setLineDash([D(8),D(5)]);
+  cx.lineDashOffset=-off;
+  cx.beginPath();
+  cx.moveTo(X(pts[0][0]),Y(pts[0][1]));
+  for(var i=1;i<pts.length;i++) cx.lineTo(X(pts[i][0]),Y(pts[i][1]));
+  cx.stroke();
+  cx.restore();
+}
+
+function gradPipe(pts,c1,c2,lw,off,alpha){
+  if(pts.length<2) return;
+  // use midpoint for gradient direction
+  var x0=pts[0][0], y0=pts[0][1], x1=pts[pts.length-1][0], y1=pts[pts.length-1][1];
+  var grad=cx.createLinearGradient(X(x0),Y(y0),X(x1),Y(y1));
+  grad.addColorStop(0,c1);
+  grad.addColorStop(1,c2);
+  cx.save();
+  cx.globalAlpha=alpha||1;
+  cx.strokeStyle=grad;
+  cx.lineWidth=D(lw||4);
+  cx.lineCap='round';
+  cx.lineJoin='round';
+  cx.setLineDash([D(8),D(5)]);
+  cx.lineDashOffset=-off;
+  cx.beginPath();
+  cx.moveTo(X(pts[0][0]),Y(pts[0][1]));
+  for(var i=1;i<pts.length;i++) cx.lineTo(X(pts[i][0]),Y(pts[i][1]));
+  cx.stroke();
+  cx.restore();
+}
+
+function solidLine(pts,col,lw){
+  if(pts.length<2) return;
+  cx.save();
+  cx.strokeStyle=col;
+  cx.lineWidth=D(lw||1);
+  cx.lineCap='round';
+  cx.lineJoin='round';
+  cx.setLineDash([]);
+  cx.beginPath();
+  cx.moveTo(X(pts[0][0]),Y(pts[0][1]));
+  for(var i=1;i<pts.length;i++) cx.lineTo(X(pts[i][0]),Y(pts[i][1]));
+  cx.stroke();
+  cx.restore();
+}
+
+function arrow(x,y,ang,col,sz,alpha){
+  cx.save();
+  cx.globalAlpha=alpha||1;
+  cx.fillStyle=col;
+  cx.translate(X(x),Y(y));
+  cx.rotate(ang);
+  var s=D(sz||5);
+  cx.beginPath();
+  cx.moveTo(s,0);
+  cx.lineTo(-s,-s*0.6);
+  cx.lineTo(-s,s*0.6);
+  cx.closePath();
+  cx.fill();
+  cx.restore();
+}
+
+function pump(pcx2,pcy,pr,lbl,tag,dir){
+  // ISA pump circle with arrow
+  cx.save();
+  cx.beginPath();
+  cx.arc(X(pcx2),Y(pcy),D(pr),0,Math.PI*2);
+  cx.fillStyle='#060a10';
+  cx.fill();
+  cx.strokeStyle='#38bdf8';
+  cx.lineWidth=D(1.2);
+  cx.setLineDash([]);
+  cx.stroke();
+  // arrow inside
+  var ang=(dir||0)*Math.PI/180;
+  cx.fillStyle='#38bdf8';
+  cx.translate(X(pcx2),Y(pcy));
+  cx.rotate(ang);
+  var s=D(pr*0.55);
+  cx.beginPath();
+  cx.moveTo(s,0);
+  cx.lineTo(-s,-s*0.65);
+  cx.lineTo(-s*0.3,0);
+  cx.lineTo(-s,s*0.65);
+  cx.closePath();
+  cx.fill();
+  cx.restore();
+  if(lbl) t(lbl,pcx2,pcy+pr+8,'#38bdf8',7,'700');
+  if(tag) t(tag,pcx2,pcy+pr+16,'#2a3d5c',6,'700');
+}
+
+function isa(x,y,fn,loop,col,r){
+  var rad=r||9;
+  cx.beginPath();
+  cx.arc(X(x),Y(y),D(rad),0,Math.PI*2);
+  cx.fillStyle='#060a10';
+  cx.fill();
+  cx.strokeStyle=col||'#5b7bb8';
+  cx.lineWidth=D(1);
+  cx.setLineDash([]);
+  cx.stroke();
+  if(loop){
+    // double circle (field-mounted)
+    cx.beginPath();
+    cx.arc(X(x),Y(y),D(rad-2.5),0,Math.PI*2);
+    cx.stroke();
   }
-  function isCharge(h){return h>=22||h<8}
-  function isDischarge(h){return h>=12&&h<20}
-  function soc(h){
-    if(h>=22) return clamp(0.10+(h-22)/10*0.90,0,1);
-    if(h<8)   return clamp(0.10+(h+2)/10*0.90,0,1);
-    if(h<12)  return 1;
-    if(h<20)  return clamp(1-(h-12)/8*0.88,0.12,1);
-    return 0.12;
+  t(fn||'',x,y-2,col||'#5b7bb8',6,'700');
+  t(loop||'',x,y+3.5,col||'#5b7bb8',5,'400');
+}
+
+function actuator(x,y,col){
+  // diaphragm actuator above valve
+  cx.save();
+  cx.fillStyle=col||'#475569';
+  cx.strokeStyle=col||'#475569';
+  cx.lineWidth=D(1);
+  cx.setLineDash([]);
+  // stem
+  cx.beginPath();
+  cx.moveTo(X(x),Y(y+8));
+  cx.lineTo(X(x),Y(y+2));
+  cx.stroke();
+  // diaphragm box
+  cx.beginPath();
+  cx.rect(X(x-7),Y(y-8),D(14),D(10));
+  cx.fillStyle='#060a10';
+  cx.fill();
+  cx.strokeStyle=col||'#475569';
+  cx.stroke();
+  // arrow down
+  cx.fillStyle=col||'#475569';
+  cx.beginPath();
+  cx.moveTo(X(x),Y(y+2));
+  cx.lineTo(X(x-3),Y(y-2));
+  cx.lineTo(X(x+3),Y(y-2));
+  cx.closePath();
+  cx.fill();
+  cx.restore();
+}
+
+// ── plate heat exchanger ──────────────────────────────────────
+function hxRect(x,y,w,h,alpha){
+  cx.save();
+  cx.globalAlpha=alpha||1;
+  if(alpha>0.2) glow(x+w/2,y+h/2,w*1.1,C.plate,alpha*0.14);
+  rr(x,y,w,h,2,'#070a14',C.plate,1.8);
+  cx.fillStyle='rgba(129,140,248,0.10)';
+  cx.fillRect(X(x+3),Y(y+3),D(w-6),D(6));
+  cx.fillRect(X(x+3),Y(y+h-9),D(w-6),D(6));
+  cx.strokeStyle='rgba(129,140,248,0.30)';
+  cx.lineWidth=D(0.7);
+  cx.setLineDash([]);
+  var plates=12;
+  for(var i=1;i<plates;i++){
+    var px=x+(w/plates)*i;
+    cx.beginPath();
+    cx.moveTo(X(px),Y(y+11));
+    cx.lineTo(X(px),Y(y+h-11));
+    cx.stroke();
   }
-  function state(h){
-    var T=temp(h);
-    var coolFrac=clamp((T-60)/(98-60),0,1);
-    var chRaw=4+8*coolFrac;
-    var s=soc(h), charging=isCharge(h), discharging=isDischarge(h);
-    var pacing=clamp(s/0.15,0,1);
-    var off= discharging ? Math.min(chRaw-2.5, OFFMAX)*pacing : 0;
-    var chEff=Math.max(2, chRaw-off);
-    var chargeKW=0;
-    if(charging){
-      var headroom=CAP-BUF-(IT+chRaw);
-      chargeKW=clamp(Math.min(3.6,headroom),0,3.6);
+  cx.strokeStyle='rgba(129,140,248,0.35)';
+  cx.lineWidth=D(0.8);
+  cx.beginPath();
+  cx.moveTo(X(x+5),Y(y+h/2));
+  cx.lineTo(X(x+w-5),Y(y+h/2));
+  cx.stroke();
+  // ports at 4 corners
+  [[x,y+12],[x,y+h-12],[x+w,y+12],[x+w,y+h-12]].forEach(function(pt){
+    cx.beginPath();
+    cx.arc(X(pt[0]),Y(pt[1]),D(4),0,Math.PI*2);
+    cx.fillStyle='#0a0f18';
+    cx.fill();
+    cx.strokeStyle=C.plate;
+    cx.lineWidth=D(1.4);
+    cx.stroke();
+  });
+  t('PLATE HEAT EXCHANGER',x+w/2,y-11,C.plate,8,'700');
+  t('HX',x+w/2,y+h/2-9,'#c7d2fe',10,'700');
+  t('water ⇄ glycol',x+w/2,y+h/2+9,'#5b6db8',7,'600');
+  cx.restore();
+}
+
+// ── V1 valve (3-way, charge/discharge/standby) ────────────────
+function drawV1(vcx2,vcy,mode,alpha){
+  var col=mode==='charge'?C.chg:mode==='discharge'?C.warm:'#475569';
+  if(mode!=='standby') glow(vcx2,vcy,28,mode==='charge'?'#3b82f6':'#f59e0b',alpha*0.22);
+  actuator(vcx2,vcy-18,col);
+  cx.save();
+  cx.globalAlpha=0.6+alpha*0.4;
+  cx.fillStyle=col;
+  cx.beginPath();
+  cx.moveTo(X(vcx2-14),Y(vcy));
+  cx.lineTo(X(vcx2),Y(vcy-10));
+  cx.lineTo(X(vcx2),Y(vcy+10));
+  cx.closePath();
+  cx.fill();
+  cx.beginPath();
+  cx.moveTo(X(vcx2+14),Y(vcy));
+  cx.lineTo(X(vcx2),Y(vcy-10));
+  cx.lineTo(X(vcx2),Y(vcy+10));
+  cx.closePath();
+  cx.fill();
+  cx.strokeStyle=col;
+  cx.lineWidth=D(2);
+  cx.setLineDash([]);
+  cx.beginPath();
+  cx.moveTo(X(vcx2),Y(vcy-10));
+  cx.lineTo(X(vcx2),Y(vcy-18));
+  cx.stroke();
+  cx.beginPath();
+  cx.arc(X(vcx2),Y(vcy),D(18),0,Math.PI*2);
+  cx.strokeStyle=col;
+  cx.lineWidth=D(1);
+  cx.stroke();
+  cx.beginPath();
+  cx.arc(X(vcx2),Y(vcy),D(3.5),0,Math.PI*2);
+  cx.fillStyle='#0a0f18';
+  cx.fill();
+  cx.strokeStyle=col;
+  cx.lineWidth=D(1);
+  cx.stroke();
+  cx.restore();
+  t('V1',vcx2,vcy,'#e2e8f0',7,'700');
+  var ml=mode==='charge'?'CHARGE':mode==='discharge'?'DISCH':'STBY';
+  t(ml,vcx2,vcy+27,col,8,'700');
+  t('FV-101',vcx2,vcy+37,'#2a3d5c',6,'700');
+}
+
+// ── V2 valve (3-way mixing) ───────────────────────────────────
+function drawV2(vcx2,vcy,alpha,mixPct){
+  var col=alpha>0.3?'#a78bfa':'#475569';
+  if(alpha>0.3) glow(vcx2,vcy,26,'#8b5cf6',alpha*0.22);
+  actuator(vcx2,vcy-18,col);
+  cx.save();
+  cx.globalAlpha=0.6+alpha*0.4;
+  cx.fillStyle=alpha>0.3?C.cold:col;
+  cx.beginPath();
+  cx.moveTo(X(vcx2+14),Y(vcy));
+  cx.lineTo(X(vcx2+2),Y(vcy-9));
+  cx.lineTo(X(vcx2+2),Y(vcy+9));
+  cx.closePath();
+  cx.fill();
+  cx.fillStyle=alpha>0.3?C.warm:col;
+  cx.beginPath();
+  cx.moveTo(X(vcx2),Y(vcy+14));
+  cx.lineTo(X(vcx2-7),Y(vcy+2));
+  cx.lineTo(X(vcx2+7),Y(vcy+2));
+  cx.closePath();
+  cx.fill();
+  cx.fillStyle=alpha>0.3?C.mix:col;
+  cx.beginPath();
+  cx.moveTo(X(vcx2-14),Y(vcy));
+  cx.lineTo(X(vcx2-2),Y(vcy-9));
+  cx.lineTo(X(vcx2-2),Y(vcy+9));
+  cx.closePath();
+  cx.fill();
+  cx.beginPath();
+  cx.arc(X(vcx2),Y(vcy),D(18),0,Math.PI*2);
+  cx.strokeStyle=col;
+  cx.lineWidth=D(1);
+  cx.stroke();
+  cx.beginPath();
+  cx.arc(X(vcx2),Y(vcy),D(3.5),0,Math.PI*2);
+  cx.fillStyle='#0a0f18';
+  cx.fill();
+  cx.strokeStyle=col;
+  cx.lineWidth=D(1);
+  cx.stroke();
+  cx.restore();
+  t('V2',vcx2,vcy,'#e2e8f0',7,'700');
+  t('MIX',vcx2,vcy+27,col,8,'700');
+  t('FV-102',vcx2,vcy+37,'#2a3d5c',6,'700');
+}
+
+// ── meter arc gauge ───────────────────────────────────────────
+function drawMeterArc(x,y,r,val,mn,mx,tgt,cap,label){
+  var a0=-148, a1=148;
+  function ra(a){return (a-90)*Math.PI/180;}
+  var fracVal=Math.min(1,Math.max(0,(val-mn)/(mx-mn)));
+  var va=a0+(fracVal)*(a1-a0);
+  var col=val>=cap-0.5?C.ret:val>=tgt?C.warm:C.cold;
+  cx.save();
+  cx.strokeStyle='#0d1a2a';
+  cx.lineWidth=D(9);
+  cx.lineCap='round';
+  cx.setLineDash([]);
+  cx.beginPath();
+  cx.arc(X(x),Y(y),D(r),ra(a0),ra(a1));
+  cx.stroke();
+  cx.strokeStyle=col;
+  cx.beginPath();
+  cx.arc(X(x),Y(y),D(r),ra(a0),ra(va));
+  cx.stroke();
+  // target tick
+  var ta=a0+((tgt-mn)/(mx-mn))*(a1-a0);
+  var tick_x=x+r*Math.cos((ta-90)*Math.PI/180);
+  var tick_y=y+r*Math.sin((ta-90)*Math.PI/180);
+  cx.strokeStyle=C.warm;
+  cx.lineWidth=D(1.5);
+  cx.beginPath();
+  cx.moveTo(X(tick_x-3),Y(tick_y-3));
+  cx.lineTo(X(tick_x+3),Y(tick_y+3));
+  cx.stroke();
+  cx.restore();
+  t(val.toFixed(1),x,y,col,22,'700');
+  t('MW',x+16,y+3,col,8,'700','left');
+  t(label,x,y+20,'#2a3d5c',7,'600');
+}
+
+// ── main draw function ────────────────────────────────────────
+function drawAll(h,st,fW,fG,fC){
+  // background
+  cx.fillStyle='#0d1117';
+  cx.fillRect(0,0,cv.width,cv.height);
+
+  // ── COMPONENT POSITIONS ──────────────────────────────────────
+  // Left column
+  var chillerX=12, chillerY=28, chillerW=170, chillerH=92;
+  var meterX2=12, meterY2=140, meterW=170, meterH=128;
+  var dcX=12, dcY=290, dcW=170, dcH=110;
+
+  // Center
+  var hxX=320, hxY=235, hxW=120, hxH=90;
+  var v1X=700, v1Y=290;
+  var v2X=486, v2Y=242;
+
+  // Right column
+  var optX=525, optY=28, optW=370, optH=98;
+  var nchX=525, nchY=140, nchW=170, nchH=90;
+  var icesX=715, icesY=148, icesW=180, icesH=310;
+
+  // ── TES BOUNDING BOX ─────────────────────────────────────────
+  rr(708,138,196,330,6,'rgba(3,7,18,0.7)','rgba(52,211,153,0.25)',1.2);
+  t('NOSTROMO TES SYSTEM',806,130,'rgba(52,211,153,0.55)',7.5,'700');
+
+  // ── PIPE ROUTING ─────────────────────────────────────────────
+  var aW=st.charging?0.9:0.08;    // water supply / return alpha when charging
+  var aD=st.discharging?0.9:0.08; // glycol discharge alpha
+  var aG=0.85;                    // always-on building water
+  var aC=st.charging?0.9:0.08;    // charge loop
+
+  // Water supply pipe (blue, left loop down-left side)
+  pipe([[182,100],[205,100],[205,310],[182,310]],C.sup,4,fW,aG);
+  // arrow on supply
+  arrow(205,200,Math.PI/2,C.sup,5,aG);
+
+  // Water return (red, left loop up-left side)
+  pipe([[182,378],[260,378],[320,378],[320,313]],C.ret,4,fW*0.9,aG);
+  pipe([[320,247],[320,65],[182,65]],C.pre,4,fW*0.9,aG);
+  arrow(260,378,0,C.ret,5,aG);
+  arrow(320,155,3*Math.PI/2,C.pre,5,aG);
+
+  // HX precool water out to chiller array (cold)
+  pipe([[320,247],[320,200],[240,200],[182,200]],C.cold,4,fW,aG*0.8);
+  arrow(280,200,Math.PI,C.cold,5,aG*0.8);
+
+  // Glycol discharge: IceBricks cold port → V1 → V2 → HX
+  var v1PortX=715+20, v1PortY=290;
+  pipe([[715,290],[700,290]],C.cold,4,fG,aD);
+  // V1 → up to V2
+  pipe([[700,272],[700,242],[504,242]],C.cold,4,fG,aD);
+  arrow(600,242,Math.PI,C.cold,5,aD);
+  // V2 → HX (west port of HX)
+  pipe([[468,242],[440,242],[440,280],[320,280],[320,313]],C.mix,4,fG,aD);
+  arrow(380,280,Math.PI,C.mix,5,aD);
+
+  // HX glycol bypass (warm out of HX bottom → V2 south)
+  pipe([[320,325],[320,378],[486,378],[486,260]],C.warm,4,fG,aD*0.8);
+  arrow(400,378,0,C.warm,5,aD*0.8);
+
+  // Charge loop: N.Chiller → P4 → V1 → IceBricks cold port
+  pipe([[695,195],[695,242],[700,242],[700,272]],C.chg,4,fC,aC);
+  arrow(695,220,Math.PI/2,C.chg,5,aC);
+  // IceBricks warm return → N.Chiller
+  pipe([[715,230],[695,230],[695,195]],C.warm,4,fC*0.85,aC*0.7);
+
+  // Optimizer signal dashes (cmd color, thin)
+  cx.save();
+  cx.strokeStyle=C.cmd;
+  cx.lineWidth=D(1);
+  cx.setLineDash([D(3),D(4)]);
+  cx.lineDashOffset=-(fC*0.5);
+  cx.globalAlpha=0.4;
+  cx.beginPath();
+  cx.moveTo(X(optX+optW/2),Y(optY+optH));
+  cx.lineTo(X(optX+optW/2),Y(nchY));
+  cx.stroke();
+  cx.beginPath();
+  cx.moveTo(X(optX+optW/2),Y(optY+optH));
+  cx.lineTo(X(v1X),Y(v1Y-24));
+  cx.stroke();
+  cx.restore();
+
+  // ── ISA INSTRUMENTS ──────────────────────────────────────────
+  isa(182,52,'FT','101',C.sup,8);
+  isa(182,385,'FT','102',C.ret,8);
+  isa(440,310,'TT','201',C.cold,8);
+  isa(440,345,'PT','202',C.plate,8);
+  isa(760,290,'TT','301',C.warm,8);
+
+  // ── PUMPS ────────────────────────────────────────────────────
+  pump(182,100,10,'P1','','270');
+  pump(182,340,10,'P2','','90');
+  pump(695,185,9,'P4','','270');
+
+  // ── HX ───────────────────────────────────────────────────────
+  hxRect(hxX,hxY,hxW,hxH,1);
+
+  // ── VALVES ───────────────────────────────────────────────────
+  var v1Mode=st.charging?'charge':st.discharging?'discharge':'standby';
+  drawV1(v1X,v1Y,v1Mode,1);
+  drawV2(v2X,v2Y,st.discharging?0.9:0.3,0.5);
+
+  // ── CHILLER ARRAY (left, customer side) ──────────────────────
+  rr(chillerX,chillerY,chillerW,chillerH,6,'#060c18','#334155',1.2);
+  t('CHILLER ARRAY',chillerX+chillerW/2,chillerY+9,'#94a3b8',10,'700');
+  t('12 UNITS · N+1',chillerX+chillerW/2,chillerY+20,'#334155',7,'600');
+  // draw chiller units (12 units in 2 rows, 6 each)
+  var totalUnits=12;
+  var onUnits=st.nRun;
+  var relUnits=st.nRel;
+  var cols=6, rows=2;
+  var uW=(chillerW-12)/(cols+0.2), uH=(chillerH-32)/rows;
+  for(var row=0;row<rows;row++){
+    for(var col=0;col<cols;col++){
+      var ui=row*cols+col;
+      var ux=chillerX+6+col*(uW+2);
+      var uy=chillerY+28+row*(uH+3);
+      var isOn=ui<onUnits;
+      var isRel=ui>=onUnits&&ui<onUnits+relUnits;
+      var bg=isRel?'rgba(52,211,153,0.15)':isOn?'rgba(248,113,113,0.15)':'#0a1018';
+      var bdr=isRel?C.cold:isOn?C.ret:'#1e2d3d';
+      rr(ux,uy,uW,uH,2,bg,bdr,0.8);
+      // fan arc
+      cx.save();
+      cx.beginPath();
+      cx.arc(X(ux+uW/2),Y(uy+uH/2),D(uH/2-2),0,Math.PI*2);
+      cx.strokeStyle=isRel?'rgba(52,211,153,0.5)':isOn?'rgba(248,113,113,0.5)':'#1e2d3d';
+      cx.lineWidth=D(0.8);
+      cx.setLineDash([]);
+      cx.stroke();
+      cx.restore();
     }
-    var meter=IT+chEff+chargeKW;
-    var meterNoStore=IT+chRaw;
-    var freed=Math.max(0,CAP-meter);
-    var phase = charging?'charge' : discharging?'discharge' : (h>=8&&h<12?'standby':'recover');
-    var chillFrac = (charging? (chRaw+chargeKW): chEff)/MAXCH;
-    return {h:h,T:T,coolFrac:coolFrac,soc:s,charging:charging,discharging:discharging,
-      chRaw:chRaw,chEff:chEff,chargeKW:chargeKW,meter:meter,meterNoStore:meterNoStore,
-      freed:freed,phase:phase,chillFrac:clamp(chillFrac,0,1),off:off};
+  }
+  // chiller temp labels
+  t('60°F SUPPLY',chillerX+chillerW/2,chillerY+chillerH-8,'#38bdf8',7.5,'700');
+
+  // ── MAIN METER (left center) ──────────────────────────────────
+  rr(meterX2,meterY2,meterW,meterH,6,'#060c18','#1d4ed8',1.4);
+  t('MAIN METER',meterX2+meterW/2,meterY2+10,'#93c5fd',10,'700');
+  t('SITE POWER · 32 MW CAP',meterX2+meterW/2,meterY2+22,'#1e3a5f',7,'600');
+  // arc gauge
+  drawMeterArc(meterX2+meterW/2,meterY2+72,36,st.meter,0,CAP,31.5,CAP,'METER MW');
+  // breakdown rows
+  var bx=meterX2+8, bw=meterW-16, by=meterY2+102;
+  // IT bar
+  var itFrac=itLoad/CAP;
+  rr(bx,by,bw*itFrac,8,1,'rgba(56,189,248,0.2)','#38bdf8',0.5);
+  t('IT '+itLoad.toFixed(1),meterX2+meterW/2,by+4,'#38bdf8',7,'700');
+  // cooling bar
+  var chFrac=st.chEff/CAP;
+  var chBx=bx+bw*itFrac;
+  rr(chBx,by+10,Math.max(0,bw*chFrac),8,1,'rgba(248,113,113,0.2)','#f87171',0.5);
+  t('COOL '+st.chEff.toFixed(1),meterX2+meterW/2,by+14,'#f87171',7,'700');
+
+  // freed caption
+  if(st.freed>0.5){
+    t('+'+st.freed.toFixed(1)+' MW freed',meterX2+meterW/2,meterY2+meterH-8,C.cold,7.5,'700');
   }
 
-  // build chips inside server racks (4 chips per rack, 3 racks)
-  (function(){
-    var g=$('chips'), hw=$('hwaves'), html='', hwhtml='';
-    var racks=[{x:504,y:528},{x:660,y:528},{x:816,y:528}];
-    racks.forEach(function(rk){
-      for(var r=0;r<4;r++){
-        var cy=rk.y+12+r*16;
-        html+='<rect class="chip" x="'+(rk.x+9)+'" y="'+cy+'" width="130" height="11" rx="2" fill="#ef4444" opacity="0.5"/>';
-      }
-    });
-    for(var i=0;i<3;i++){
-      var cx=578+i*156;
-      hwhtml+='<path class="heatwave" d="M'+cx+' 528 q5 -7 0 -14 q-5 -7 0 -14" stroke="#f97316" stroke-width="2" fill="none" style="animation-delay:'+(i*0.6)+'s"/>';
-    }
-    g.innerHTML=html;
-    hw.innerHTML=hwhtml;
-  })();
-
-  var pipes={
-    gridCharge:$('p_gridCharge'), gridDC:$('p_gridDC'),
-    nFreezeL:$('p_nFreezeL'), nFreezeR:$('p_nFreezeR'),
-    iceHX:$('p_iceHX'), hxNos:$('p_hxNos'),
-    bldCold:$('p_bldCold'), bldWarm:$('p_bldWarm'),
-    hxBldCold:$('p_hxBldCold'), hxBldWarm:$('p_hxBldWarm'),
-    cduSrv:$('p_cduSrv'), srvCdu:$('p_srvCdu')
-  };
-
-  function setPipe(p,on,grid){
-    if(!p) return;
-    if(grid){
-      p.classList.toggle('gridon',on);
-      if(!on) p.classList.remove('gridon');
-    } else {
-      p.classList.toggle('on',on);
-      if(!on) p.classList.remove('on');
-    }
-  }
-
-  var cus=[].slice.call(document.querySelectorAll('#chillers .cu'));
-  var ncus=[].slice.call(document.querySelectorAll('#nchillers .cu'));
-  var chipsEls=[].slice.call(document.querySelectorAll('.chip'));
-
-  function lerpColor(a,b,t){
-    return 'rgb('+Math.round(a[0]+(b[0]-a[0])*t)+','+Math.round(a[1]+(b[1]-a[1])*t)+','+Math.round(a[2]+(b[2]-a[2])*t)+')';
-  }
-
-  function fmt(n){return n.toFixed(1)}
-
-  function draw(h){
-    var st=state(h);
-    var hh=Math.floor(h), mm=Math.floor((h-hh)*60);
-    var tstr=String(hh).padStart(2,'0')+':'+String(mm).padStart(2,'0');
-
-    $('stTime').textContent=tstr;
-    $('stTemp').textContent=Math.round(st.T)+'°';
-    $('stMeter').textContent=fmt(st.meter);
-    $('stMeter').style.color = st.meter>CAP-0.4?'var(--red)':'var(--white)';
-    $('stFreed').textContent=fmt(st.freed);
-
-    var pill=$('phasePill');
-    var labels={charge:'● Charging',standby:'● Charged · holding',discharge:'● Discharging',recover:'● Resetting'};
-    pill.className='phase-pill '+st.phase;
-    pill.textContent=labels[st.phase];
-
-    var W=$('bar').clientWidth||900;
-    var sc=W/(CAP*1.06);
-    var xIT=IT*sc;
-    $('segIT').style.width=xIT+'px';
-    var chW=st.chEff*sc;
-    $('segChill').style.left=xIT+'px'; $('segChill').style.width=chW+'px';
-    $('segChillTxt').textContent= chW>54? 'cooling '+fmt(st.chEff):'';
-    var chgX=xIT+chW;
-    var chgW=st.chargeKW*sc;
-    $('segCharge').style.left=chgX+'px'; $('segCharge').style.width=chgW+'px';
-    $('segChargeTxt').textContent= chgW>46? 'charge '+fmt(st.chargeKW):'';
-    var meterX=(IT+st.chEff+st.chargeKW)*sc;
-    var freedW=Math.max(0,(CAP-st.meter)*sc);
-    $('segFreed').style.left=meterX+'px'; $('segFreed').style.width=freedW+'px';
-    $('segFreedTxt').textContent= (st.freed>1.2 && freedW>74)? '+'+fmt(st.freed)+' MW freed':'';
-    $('capLine').style.left=(CAP*sc)+'px';
-    var ns=$('noStore');
-    if(st.off>0.4){ ns.style.left=(st.meterNoStore*sc)+'px'; ns.style.opacity=1; }
-    else ns.style.opacity=0;
-
+  // ── DATA CENTER (left bottom) ─────────────────────────────────
+  rr(dcX,dcY,dcW,dcH,6,'#060c18','#334155',1.2);
+  t('DATA CENTER',dcX+dcW/2,dcY+10,'#94a3b8',10,'700');
+  // 4 racks
+  for(var ri=0;ri<4;ri++){
+    var rackX=dcX+8+ri*(dcW-16)/4+1;
+    var rackY=dcY+22;
+    var rackW=(dcW-20)/4;
+    var rackH=dcH-38;
     var heat=st.coolFrac;
-    $('sunGlow').setAttribute('opacity',(0.12+heat*0.55).toFixed(2));
-    $('sunGlow').setAttribute('r',(40+heat*44).toFixed(0));
-    $('sunCore').setAttribute('opacity',(0.25+heat*0.7).toFixed(2));
-    $('sunCore').setAttribute('r',(14+heat*8).toFixed(0));
-    $('sunTemp').textContent=Math.round(st.T)+'°F';
-
-    // IceBricks SOC (tank: y=330, height=252)
-    var tankTop=330, tankH=252;
-    var fh=st.soc*tankH;
-    $('socFill').setAttribute('y',(tankTop+tankH-fh).toFixed(1));
-    $('socFill').setAttribute('height',fh.toFixed(1));
-    $('socShine').setAttribute('y',(tankTop+tankH-fh-2).toFixed(1));
-    $('socPct').textContent=Math.round(st.soc*100)+'%';
-
-    // store label
-    var sl=$('storeLabel');
-    if(st.charging){ sl.textContent='charging'; sl.setAttribute('fill','#22d3ee'); }
-    else if(st.discharging){ sl.textContent='discharging'; sl.setAttribute('fill','#14B8A6'); }
-    else { sl.textContent='thermal store'; sl.setAttribute('fill','#64748b'); }
-
-    // DC chiller plant (6 units)
-    var onCount=clamp(Math.round(st.chillFrac*6),0,6);
-    cus.forEach(function(cu,i){
-      cu.classList.toggle('on', i<onCount);
-      cu.classList.remove('charging');
-    });
-
-    // Nostromo chillers (3 units) — animate with charging state
-    var nOn=st.charging ? 3 : (st.discharging ? 0 : 1);
-    ncus.forEach(function(cu,i){
-      cu.classList.toggle('charging', st.charging && i<nOn);
-      cu.classList.toggle('on', !st.charging && i<nOn);
-    });
-
-    // chip heat colour
-    var cool=[34,197,94], warm=[239,68,68];
-    chipsEls.forEach(function(c,i){
-      var jitter=((i*37)%10)/40;
-      var hk=clamp(heat+jitter-0.12,0,1);
-      c.setAttribute('fill', lerpColor(cool,warm,hk));
-      c.setAttribute('opacity',(0.4+hk*0.5).toFixed(2));
-    });
-
-    // Zone stats
-    var chillMW = st.chEff.toFixed(1);
-    var pue = (1 + st.chEff / IT).toFixed(2);
-    $('dcChillKw').textContent = chillMW + ' MW';
-    $('dcPue').textContent = pue;
-    $('dcItLoad').textContent = fmt(IT + (st.freed > 1.2 ? st.freed : 0)) + ' MW';
-
-    // Nostromo stats
-    var nosPhase = st.charging ? '● CHARGING' : st.discharging ? '● DISCHARGING' : '● STANDBY';
-    var nosColor = st.charging ? '#22d3ee' : st.discharging ? '#14B8A6' : '#64748b';
-    $('nosPhaseText').textContent = nosPhase;
-    $('nosPhaseText').setAttribute('fill', nosColor);
-    $('nosSoc').textContent = Math.round(st.soc * 100) + '%';
-    var nosKwVal = st.charging ? fmt(st.chargeKW * 1000) + ' kW' : st.discharging ? fmt(st.off * 1000) + ' kW' : '—';
-    $('nosKw').textContent = nosKwVal;
-
-    // dc load text
-    $('dcLoad').textContent = st.freed>1.2 ? 'IT 20.0 + '+fmt(st.freed)+' MW unlockable' : 'IT load 20.0 MW';
-
-    // Pipes
-    setPipe(pipes.gridCharge, st.charging, true);
-    setPipe(pipes.gridDC, true, true);
-    setPipe(pipes.nFreezeL, st.charging, false);
-    setPipe(pipes.nFreezeR, st.charging, false);
-    setPipe(pipes.iceHX, st.discharging, false);
-    setPipe(pipes.hxNos, st.discharging, false);
-    setPipe(pipes.bldCold, true, false);
-    setPipe(pipes.bldWarm, true, false);
-    setPipe(pipes.hxBldCold, st.discharging, false);
-    setPipe(pipes.hxBldWarm, st.discharging, false);
-    setPipe(pipes.cduSrv, true, false);
-    setPipe(pipes.srvCdu, true, false);
-  }
-
-  function drawTrigger(prog) {
-    var svg = $('trigSvg');
-    var W = 1300, H = 230;
-    var LM = 52, RM = 20, TM = 10, BM = 28;
-    var PW = W - LM - RM;
-    var PH = H - TM - BM;
-
-    // build 200 data points
-    var pts = [];
-    for (var i = 0; i <= 200; i++) {
-      var h = (i / 200) * 24;
-      var st = state(h);
-      pts.push(st);
+    var rCol=lerpHex('#1e3a5f','#7f1d1d',heat);
+    rr(rackX,rackY,rackW,rackH,2,rCol,'#334155',0.6);
+    // chips
+    for(var ci=0;ci<4;ci++){
+      var chipY=rackY+4+ci*(rackH-8)/4;
+      var chipCol=lerpHex(C.cold,C.ret,heat);
+      rr(rackX+2,chipY,rackW-4,6,1,chipCol,chipCol,0);
     }
+  }
+  t('60°F SUPPLY  /  70°F RETURN',dcX+dcW/2,dcY+dcH-8,'#475569',7,'600');
 
-    var SECTIONS = 3;
-    var SH = (PH - 20) / SECTIONS;
-    var sy = [TM, TM + SH + 10, TM + (SH + 10) * 2];
+  // ── OPTIMIZER BOX (top right) ─────────────────────────────────
+  rr(optX,optY,optW,optH,6,'#070a14',C.cmd,1.4);
+  // glow
+  glow(optX+optW/2,optY+optH/2,optW*0.6,C.cmd,0.07);
+  t('OPTIMIZER',optX+optW/2,optY+12,C.cmd,11,'700');
+  t('NOSTROMO DISPATCH ENGINE',optX+optW/2,optY+24,'#4c1d95',7.5,'600');
+  // status tags
+  var dispLine='PHASE: '+st.phase.toUpperCase()+'   SOC: '+Math.round(st.soc*100)+'%   METER: '+st.meter.toFixed(1)+' MW';
+  t(dispLine,optX+optW/2,optY+40,C.cmd,7.5,'700');
+  t('IT: '+itLoad.toFixed(1)+' MW   COOL: '+st.chEff.toFixed(1)+' MW   CAP: '+CAP+' MW   FREED: '+st.freed.toFixed(1)+' MW',
+    optX+optW/2,optY+55,'#5b21b6',7,'600');
+  t('CHARGE WINDOW: 22:00–08:00   DISCHARGE: 12:00–20:00',optX+optW/2,optY+70,'#3b1764',7,'600');
+  // outer border glow
+  cx.save();
+  cx.strokeStyle=C.cmd;
+  cx.lineWidth=D(0.5);
+  cx.globalAlpha=0.3+0.2*Math.sin(Date.now()/1200);
+  cx.setLineDash([D(4),D(6)]);
+  rr(optX-2,optY-2,optW+4,optH+4,7,null,C.cmd,0.5);
+  cx.restore();
 
-    // phase band definitions
-    var bands = [
-      {start:0,end:8,cls:'charge'},
-      {start:8,end:12,cls:'standby'},
-      {start:12,end:20,cls:'discharge'},
-      {start:20,end:22,cls:'standby'},
-      {start:22,end:24,cls:'charge'}
-    ];
-    var bandColors = {charge:'rgba(6,182,212,.07)',standby:'rgba(100,116,139,.04)',discharge:'rgba(20,184,166,.07)'};
-    var bandLabelColors = {charge:'#22d3ee',standby:'#475569',discharge:'#14B8A6'};
-    var bandLabels = {charge:'CHARGE',standby:'STANDBY',discharge:'DISCHARGE'};
-
-    var html = '';
-
-    // x-axis grid + labels
-    for (var h2 = 0; h2 <= 24; h2 += 6) {
-      var gx = LM + (h2/24)*PW;
-      html += '<line x1="'+gx+'" y1="'+TM+'" x2="'+gx+'" y2="'+(TM+PH)+'" stroke="rgba(255,255,255,.05)" stroke-width="1"/>';
-      html += '<text x="'+gx+'" y="'+(TM+PH+18)+'" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#64748b">'+String(h2).padStart(2,'0')+':00</text>';
-    }
-
-    // phase bands (full height)
-    bands.forEach(function(b) {
-      var bx = LM + (b.start/24)*PW;
-      var bw = ((b.end-b.start)/24)*PW;
-      html += '<rect x="'+bx+'" y="'+TM+'" width="'+bw+'" height="'+PH+'" fill="'+bandColors[b.cls]+'"/>';
-      var cx2 = bx + bw/2;
-      html += '<text x="'+cx2+'" y="'+(TM+8)+'" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="7.5" letter-spacing="1" fill="'+bandLabelColors[b.cls]+'" opacity="0.7">'+bandLabels[b.cls]+'</text>';
-    });
-
-    // --- SECTION 1: Temperature (top) ---
-    var tempMin=64, tempMax=98;
-    var s0y = TM + 12, s0h = SH - 2;
-    html += '<text x="'+(LM-6)+'" y="'+(s0y+s0h/2+4)+'" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="8" fill="#FBBF24">TEMP</text>';
-    var tPts = pts.map(function(p,i){
-      var tx = LM + (i/200)*PW;
-      var ty = s0y + s0h - ((p.T-tempMin)/(tempMax-tempMin))*s0h;
-      return [tx,ty];
-    });
-    var tLine = tPts.map(function(p,i){return (i?'L':'M')+p[0]+' '+p[1]}).join(' ');
-    var tArea = tLine + ' L'+(LM+PW)+' '+(s0y+s0h)+' L'+LM+' '+(s0y+s0h)+' Z';
-    html += '<path d="'+tArea+'" fill="rgba(251,191,36,.12)"/>';
-    html += '<path d="'+tLine+'" fill="none" stroke="#FBBF24" stroke-width="1.5"/>';
-    // discharge trigger threshold at ~85°F
-    var trigTy = s0y + s0h - ((85-tempMin)/(tempMax-tempMin))*s0h;
-    html += '<line x1="'+LM+'" y1="'+trigTy+'" x2="'+(LM+PW)+'" y2="'+trigTy+'" stroke="#14B8A6" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>';
-    html += '<text x="'+(LM+PW-2)+'" y="'+(trigTy-3)+'" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="7.5" fill="#14B8A6" opacity="0.7">→ discharge trigger</text>';
-
-    // --- SECTION 2: Meter load vs cap (middle) ---
-    var mMin=0, mMax=CAP*1.06;
-    var s1y = s0y + s0h + 10;
-    var s1h = SH - 2;
-    html += '<text x="'+(LM-6)+'" y="'+(s1y+s1h/2+4)+'" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="8" fill="#3B82F6">METER</text>';
-    // cap line
-    var capMy = s1y + s1h - (CAP/mMax)*s1h;
-    html += '<line x1="'+LM+'" y1="'+capMy+'" x2="'+(LM+PW)+'" y2="'+capMy+'" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="5 4" opacity="0.7"/>';
-    html += '<text x="'+(LM+PW-2)+'" y="'+(capMy-3)+'" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="7.5" fill="#ef4444" opacity="0.8">cap '+CAP+' MW</text>';
-    // no-storage line (dashed, dimmer)
-    var mNoPts = pts.map(function(p,i){
-      var tx = LM + (i/200)*PW;
-      var ty = s1y + s1h - (p.meterNoStore/mMax)*s1h;
-      return [tx,ty];
-    });
-    var mNoLine = mNoPts.map(function(p,i){return (i?'L':'M')+p[0]+' '+p[1]}).join(' ');
-    html += '<path d="'+mNoLine+'" fill="none" stroke="#ef4444" stroke-width="1" stroke-dasharray="3 5" opacity="0.35"/>';
-    // with-storage line
-    var mPts = pts.map(function(p,i){
-      var tx = LM + (i/200)*PW;
-      var ty = s1y + s1h - (p.meter/mMax)*s1h;
-      return [tx,ty];
-    });
-    var mLine = mPts.map(function(p,i){return (i?'L':'M')+p[0]+' '+p[1]}).join(' ');
-    var mArea = mLine + ' L'+(LM+PW)+' '+(s1y+s1h)+' L'+LM+' '+(s1y+s1h)+' Z';
-    html += '<path d="'+mArea+'" fill="rgba(59,130,246,.12)"/>';
-    html += '<path d="'+mLine+'" fill="none" stroke="#3B82F6" stroke-width="1.5"/>';
-    // charge headroom label
-    html += '<text x="'+(LM+8)+'" y="'+(capMy-6)+'" font-family="JetBrains Mono,monospace" font-size="7.5" fill="#22d3ee" opacity="0.65">headroom → charge</text>';
-
-    // --- SECTION 3: SOC (bottom) ---
-    var s2y = s1y + s1h + 10;
-    var s2h = SH - 2;
-    html += '<text x="'+(LM-6)+'" y="'+(s2y+s2h/2+4)+'" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="8" fill="#14B8A6">SOC</text>';
-    var socPts = pts.map(function(p,i){
-      var tx = LM + (i/200)*PW;
-      var ty = s2y + s2h - p.soc*s2h;
-      return [tx,ty];
-    });
-    var socLine = socPts.map(function(p,i){return (i?'L':'M')+p[0]+' '+p[1]}).join(' ');
-    var socArea = socLine + ' L'+(LM+PW)+' '+(s2y+s2h)+' L'+LM+' '+(s2y+s2h)+' Z';
-    html += '<path d="'+socArea+'" fill="rgba(20,184,166,.18)"/>';
-    html += '<path d="'+socLine+'" fill="none" stroke="#14B8A6" stroke-width="1.5"/>';
-    // 10% hard floor
-    var floorY = s2y + s2h - 0.10*s2h;
-    html += '<line x1="'+LM+'" y1="'+floorY+'" x2="'+(LM+PW)+'" y2="'+floorY+'" stroke="#FBBF24" stroke-width="1" stroke-dasharray="3 5" opacity="0.5"/>';
-    html += '<text x="'+(LM+2)+'" y="'+(floorY-3)+'" font-family="JetBrains Mono,monospace" font-size="7.5" fill="#FBBF24" opacity="0.65">10% floor</text>';
-
-    // --- Current time cursor ---
-    var curX = LM + prog * PW;
-    html += '<line x1="'+curX+'" y1="'+TM+'" x2="'+curX+'" y2="'+(TM+PH)+'" stroke="rgba(255,255,255,.8)" stroke-width="1.5"/>';
-    html += '<circle cx="'+curX+'" cy="'+(TM)+'" r="3" fill="#fff" opacity="0.8"/>';
-
-    svg.innerHTML = html;
+  // ── NOSTROMO GLYCOL CHILLER ───────────────────────────────────
+  rr(nchX,nchY,nchW,nchH,6,'#060c18',st.charging?C.chg:'#334155',1.4);
+  t('N. GLYCOL CHILLER',nchX+nchW/2,nchY+10,'#a5b4fc',10,'700');
+  // condenser row
+  rr(nchX+6,nchY+20,nchW-12,18,2,'#0a1018','#1e3050',0.7);
+  t('CONDENSER',nchX+nchW/2,nchY+30,'#475569',7,'600');
+  // compressor circle
+  cx.beginPath();
+  cx.arc(X(nchX+nchW/2),Y(nchY+54),D(13),0,Math.PI*2);
+  cx.fillStyle='#0a1018';
+  cx.fill();
+  cx.strokeStyle=st.charging?C.chg:'#334155';
+  cx.lineWidth=D(1.2);
+  cx.setLineDash([]);
+  cx.stroke();
+  t('COMP',nchX+nchW/2,nchY+54,'#94a3b8',6.5,'700');
+  // evaporator row
+  rr(nchX+6,nchY+70,nchW-12,14,2,'#0a1018',st.charging?'rgba(96,165,250,0.4)':'#1e3050',0.7);
+  t('EVAPORATOR',nchX+nchW/2,nchY+78,'#475569',7,'600');
+  // charging animation indicator
+  if(st.charging){
+    glow(nchX+nchW/2,nchY+nchH/2,60,C.chg,0.12);
   }
 
-  var progress=0, playing=false, speed=2, raf=null, last=0;
-  function setSpeed(s){speed=s;['s1','s2','s4'].forEach(function(id){$(id).classList.remove('on')});$('s'+s).classList.add('on')}
-  $('s1').onclick=function(){setSpeed(1)};$('s2').onclick=function(){setSpeed(2)};$('s4').onclick=function(){setSpeed(4)};
+  // ── ICEBRICKS TES ─────────────────────────────────────────────
+  var shimmer=0.26+st.soc*0.16+0.06*Math.sin(Date.now()/700);
+  var tesGlowCol=st.discharging?C.cold:st.charging?C.chg:'#334155';
+  if(st.discharging||st.charging) glow(icesX+icesW/2,icesY+icesH/2,icesW*0.7,tesGlowCol,0.14);
+  rr(icesX,icesY,icesW,icesH,6,'#060c18',tesGlowCol,1.4);
+  t('ICEBRICKS TES',icesX+icesW/2,icesY+12,'#5eead4',11,'700');
+  t('15 TRh CAPACITY',icesX+icesW/2,icesY+24,'#134e4a',7,'600');
 
-  function render(){
-    var h=progress*24;
-    draw(h);
-    drawTrigger(progress);
-    $('tlfill').style.width=(progress*100)+'%';
+  // level fill
+  var fillH=st.soc*(icesH-38);
+  var fillY=icesY+icesH-6-fillH;
+  // fill gradient
+  var fillGrad=cx.createLinearGradient(X(icesX+8),Y(fillY),X(icesX+8),Y(fillY+fillH));
+  fillGrad.addColorStop(0,'rgba(34,211,238,'+shimmer+')');
+  fillGrad.addColorStop(1,'rgba(52,211,153,'+(shimmer*0.6)+')');
+  cx.save();
+  cx.globalAlpha=1;
+  // clip to TES box interior
+  cx.beginPath();
+  cx.rect(X(icesX+4),Y(icesY+32),D(icesW-8),D(icesH-38));
+  cx.clip();
+  cx.fillStyle=fillGrad;
+  cx.fillRect(X(icesX+4),Y(fillY),D(icesW-8),D(fillH));
+  // ice grid lines
+  cx.strokeStyle='rgba(13,26,42,0.4)';
+  cx.lineWidth=D(0.8);
+  cx.setLineDash([]);
+  for(var gx2=icesX+4;gx2<icesX+icesW-4;gx2+=28){
+    cx.beginPath();
+    cx.moveTo(X(gx2),Y(icesY+32));
+    cx.lineTo(X(gx2),Y(icesY+icesH-6));
+    cx.stroke();
   }
-  function tick(now){
-    if(!playing)return;
-    var dt=(now-last)/1000; last=now;
+  for(var gy2=icesY+32;gy2<icesY+icesH-6;gy2+=28){
+    cx.beginPath();
+    cx.moveTo(X(icesX+4),Y(gy2));
+    cx.lineTo(X(icesX+icesW-4),Y(gy2));
+    cx.stroke();
+  }
+  // shimmer line at top of fill
+  if(fillH>5){
+    cx.strokeStyle='rgba(167,243,208,0.7)';
+    cx.lineWidth=D(1.5);
+    cx.beginPath();
+    cx.moveTo(X(icesX+4),Y(fillY));
+    cx.lineTo(X(icesX+icesW-4),Y(fillY));
+    cx.stroke();
+  }
+  cx.restore();
+
+  // SOC percentage text
+  var socPct2=Math.round(st.soc*100);
+  t(socPct2+'%',icesX+icesW/2,icesY+icesH/2-8,'#ffffff',22,'700');
+  t('STATE OF CHARGE',icesX+icesW/2,icesY+icesH/2+10,'#94a3b8',7,'600');
+
+  // port indicators
+  [[icesX,icesY+icesH*0.35],[icesX,icesY+icesH*0.65],
+   [icesX+icesW,icesY+icesH*0.35],[icesX+icesW,icesY+icesH*0.65]].forEach(function(pt,pi){
+    cx.beginPath();
+    cx.arc(X(pt[0]),Y(pt[1]),D(4),0,Math.PI*2);
+    cx.fillStyle='#0a0f18';
+    cx.fill();
+    cx.strokeStyle=pi<2?C.cold:C.warm;
+    cx.lineWidth=D(1.2);
+    cx.setLineDash([]);
+    cx.stroke();
+  });
+
+  // state label at bottom
+  var tesLbl=st.charging?'CHARGING':st.discharging?'DISCHARGING':'HOLDING';
+  var tesLblCol=st.charging?C.chg:st.discharging?C.cold:'#334155';
+  t(tesLbl,icesX+icesW/2,icesY+icesH-10,tesLblCol,8,'700');
+
+  // ── TEMPERATURE LABELS ON PIPES ────────────────────────────────
+  t('45°F',205,175,C.sup,8.5,'700');
+  t('54°F',205,270,C.ret,8.5,'700');
+  t('32°F',750,290,C.cold,8.5,'700');
+  t('82°F',486,310,C.warm,8.5,'700');
+  t(Math.round(st.T)+'°F',900,55,C.warm,9,'700');
+
+  // ── FOOTER / COLOR KEY ─────────────────────────────────────────
+  var fkeys=[
+    {col:C.sup,label:'WATER SUPPLY'},
+    {col:C.ret,label:'WATER RETURN'},
+    {col:C.cold,label:'COLD GLYCOL'},
+    {col:C.warm,label:'WARM GLYCOL'},
+    {col:C.chg,label:'CHARGE LOOP'},
+    {col:C.cmd,label:'OPTIMIZER'},
+    {col:C.plate,label:'HX / PLATE'}
+  ];
+  var fkStartX=12, fkY=543, fkSpacing=128;
+  fkeys.forEach(function(fk,fi){
+    var kx=fkStartX+fi*fkSpacing;
+    cx.save();
+    cx.fillStyle=fk.col;
+    cx.fillRect(X(kx),Y(fkY-2),D(18),D(4));
+    cx.restore();
+    t(fk.label,kx+22,fkY,fk.col,7.5,'600','left');
+  });
+}
+
+// ── HUD UPDATE ────────────────────────────────────────────────
+function updateHUD(h,st){
+  var hh=Math.floor(h), mm=Math.floor((h-hh)*60);
+  document.getElementById('clock').textContent=
+    String(hh).padStart(2,'0')+':'+String(mm).padStart(2,'0');
+  var scrub2=document.getElementById('scrub');
+  scrub2.value=Math.round(h/24*9999);
+
+  var badge=document.getElementById('badge');
+  var phases={
+    charge:{text:'CHARGING',bg:'rgba(6,182,212,.15)',border:'#22d3ee',col:'#22d3ee'},
+    discharge:{text:'DISCHARGING',bg:'rgba(20,184,166,.15)',border:'#14B8A6',col:'#14B8A6'},
+    standby:{text:'STANDBY',bg:'rgba(255,255,255,.03)',border:'#14213a',col:'#14213a'},
+    recover:{text:'RESETTING',bg:'rgba(249,115,22,.12)',border:'#f97316',col:'#f97316'}
+  };
+  var p=phases[st.phase]||phases.standby;
+  badge.textContent=p.text;
+  badge.style.background=p.bg;
+  badge.style.borderColor=p.border;
+  badge.style.color=p.col;
+}
+
+// ── ANIMATION LOOP ────────────────────────────────────────────
+var fW=0, fG=0, fC=0;
+var progress=0, playing=false, speed=2, last2=0;
+
+function loop(now){
+  requestAnimationFrame(loop);
+  if(playing){
+    var dt=(now-last2)/1000;
+    last2=now;
     progress+=dt*speed*0.022;
-    if(progress>=1){progress=progress-1;}
-    render();
-    raf=requestAnimationFrame(tick);
+    if(progress>=1) progress-=1;
+  } else {
+    last2=now;
   }
-  function play(){playing=true;$('play').textContent='⏸';last=performance.now();raf=requestAnimationFrame(tick)}
-  function pause(){playing=false;$('play').textContent='▶';cancelAnimationFrame(raf)}
-  $('play').onclick=function(){playing?pause():play()};
+  fW+=0.38; fG+=0.35; fC+=0.32;
 
-  var tl=$('tlbg'),drag=false;
-  function scrub(clientX){var r=tl.getBoundingClientRect();progress=clamp((clientX-r.left)/r.width,0,0.9999);render()}
-  tl.addEventListener('mousedown',function(e){drag=true;scrub(e.clientX)});
-  document.addEventListener('mousemove',function(e){if(drag)scrub(e.clientX)});
-  document.addEventListener('mouseup',function(){drag=false});
-  tl.addEventListener('touchstart',function(e){drag=true;scrub(e.touches[0].clientX);e.preventDefault()},{passive:false});
-  document.addEventListener('touchmove',function(e){if(drag)scrub(e.touches[0].clientX)});
-  document.addEventListener('touchend',function(){drag=false});
+  var h=progress*24;
+  var st=state(h);
+  drawAll(h,st,fW,fG,fC);
+  updateHUD(h,st);
+}
+requestAnimationFrame(loop);
 
-  window.addEventListener('resize',render);
-  progress=0.0; render();
-  setTimeout(play,600);
+// ── CONTROLS ──────────────────────────────────────────────────
+var playbtn=document.getElementById('playbtn');
+playbtn.addEventListener('click',function(){
+  playing=!playing;
+  playbtn.textContent=playing?'⏸ PAUSE':'▶ PLAY';
+  if(playing) last2=performance.now();
 });
+
+function setSpeed(s){
+  speed=s;
+  ['s1btn','s2btn','s4btn'].forEach(function(id){
+    var el=document.getElementById(id);
+    el.style.color='#5b7bb8';
+    el.style.borderColor='#1e3050';
+  });
+  var active=document.getElementById('s'+s+'btn');
+  active.style.color='#a78bfa';
+  active.style.borderColor='#3b2a6a';
+}
+document.getElementById('s1btn').addEventListener('click',function(){setSpeed(1);});
+document.getElementById('s2btn').addEventListener('click',function(){setSpeed(2);});
+document.getElementById('s4btn').addEventListener('click',function(){setSpeed(4);});
+
+// scrub
+var scrubEl=document.getElementById('scrub');
+scrubEl.addEventListener('input',function(){
+  progress=parseInt(this.value)/9999;
+  if(!playing) last2=performance.now();
+});
+
+// sliders
+var siEl=document.getElementById('si');
+var saEl=document.getElementById('sa');
+siEl.addEventListener('input',function(){
+  itLoad=parseFloat(this.value);
+  document.getElementById('li').textContent=itLoad.toFixed(1)+' MW';
+});
+saEl.addEventListener('input',function(){
+  ambientPeak=parseInt(this.value);
+  document.getElementById('la').textContent=ambientPeak+'°F';
+});
+
+// start playing after a brief pause
+setTimeout(function(){
+  playing=true;
+  last2=performance.now();
+  playbtn.textContent='⏸ PAUSE';
+},600);
+
+})();
 </script>
 </body>
 </html>
