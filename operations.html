@@ -8,9 +8,8 @@
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/main.css">
 <style>
-.shell{max-width:1320px;margin:0 auto;padding:18px clamp(14px,3vw,34px) 30px}
+.shell{max-width:1440px;margin:0 auto;padding:18px clamp(14px,3vw,34px) 30px}
 
-/* header row */
 .ohead{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap;margin-bottom:14px}
 .ohead .htitle h1{font-size:clamp(22px,3.2vw,30px);font-weight:800;letter-spacing:-.4px}
 .ohead .htitle .phase-pill{display:inline-flex;align-items:center;gap:8px;margin-top:8px;
@@ -30,7 +29,6 @@
 .stat.freed{border-color:rgba(34,197,94,.32);background:linear-gradient(180deg,rgba(34,197,94,.06),var(--card))}
 .stat.freed .l{color:var(--green)}.stat.freed .v{color:var(--green)}
 
-/* meter strip */
 .meterstrip{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 18px 16px;margin-bottom:14px}
 .meterstrip .mtop{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px}
 .meterstrip .mtop .lab{font-size:12px;font-weight:700;letter-spacing:.3px;color:var(--grayL)}
@@ -43,37 +41,18 @@
 .seg.chiller{background:linear-gradient(180deg,#ef4444,#c0392b)}
 .seg.charge{background:repeating-linear-gradient(45deg,#f97316,#f97316 6px,#d96510 6px,#d96510 12px)}
 .seg.freed{background:linear-gradient(180deg,rgba(34,197,94,.32),rgba(34,197,94,.16));border:1px dashed rgba(34,197,94,.6);border-radius:0 8px 8px 0}
-.seg.freed span{color:#86efac}
+.seg.freed span{color:var(--green)}
 .bar .capline{position:absolute;top:-6px;bottom:-6px;width:3px;background:var(--red);box-shadow:0 0 8px rgba(239,68,68,.7);z-index:5}
 .bar .nostore{position:absolute;top:-9px;bottom:-9px;width:0;border-left:2px dashed rgba(239,68,68,.9);z-index:6;transition:left .25s,opacity .3s}
-.bar .nostore::after{content:"◄ without storage";position:absolute;top:42px;left:-86px;font-family:var(--m);
+.bar .nostore::after{content:"◄ without storage";position:absolute;top:-22px;left:-86px;font-family:var(--m);
   font-size:9.5px;color:#fca5a5;white-space:nowrap}
 .mlegend{display:flex;gap:18px;margin-top:18px;flex-wrap:wrap}
 .mlegend span{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--grayL)}
 .mlegend i{width:13px;height:13px;border-radius:3px;display:inline-block}
 
-/* main */
-.omain{display:grid;grid-template-columns:1fr 312px;gap:14px;align-items:stretch}
-@media(max-width:1000px){.omain{grid-template-columns:1fr}}
 .stage{background:linear-gradient(180deg,var(--card),var(--bg2));border:1px solid var(--line);border-radius:16px;padding:8px;position:relative;overflow:hidden}
 .stage svg{display:block;width:100%;height:auto}
 
-.side{display:flex;flex-direction:column;gap:12px}
-.icard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 17px;transition:border-color .4s}
-.icard.glow{border-color:rgba(20,184,166,.3)}
-.icard .ck{font-family:var(--m);font-size:10px;letter-spacing:1.5px;color:var(--gray);text-transform:uppercase;font-weight:700}
-.icard .ct{font-size:16px;font-weight:800;margin:5px 0 8px;line-height:1.2}
-.icard .cb{font-size:13px;color:var(--grayL);line-height:1.6}
-.icard .cb b{color:var(--white);font-weight:600}
-.icard .cb .t{color:var(--teal)}.icard .cb .r{color:var(--red)}.icard .cb .g{color:var(--green)}.icard .cb .o{color:var(--gold)}
-.metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:auto}
-.mtile{background:rgba(0,0,0,.22);border-radius:9px;padding:9px 11px;border-left:3px solid var(--gray)}
-.mtile.soc{border-color:var(--teal)}.mtile.chill{border-color:var(--red)}
-.mtile .ml{font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:var(--gray);font-weight:700}
-.mtile .mv{font-family:var(--m);font-size:18px;font-weight:700;margin-top:2px}
-.side .icard.flex{flex:1;display:flex;flex-direction:column}
-
-/* controls */
 .controls{display:flex;align-items:center;gap:12px;margin-top:14px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 15px}
 .pbtn{width:46px;height:46px;border-radius:11px;border:none;cursor:pointer;flex-shrink:0;background:var(--teal);color:var(--bg);
   font-size:19px;display:flex;align-items:center;justify-content:center;transition:.2s}
@@ -91,6 +70,23 @@
 .legend-stage{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;justify-content:center}
 .legend-stage span{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--grayL)}
 .legend-stage i{width:18px;height:4px;border-radius:2px;display:inline-block}
+
+.pipe{fill:none;stroke-width:6;stroke-linecap:round;stroke-dasharray:12 9;opacity:.16;transition:opacity .45s,stroke-width .45s}
+.pipe.gridpipe{stroke-width:3;stroke-dasharray:7 7}
+.pipe.on{opacity:1;animation:dashmv .7s linear infinite}
+.pipe.on.rev{animation:dashmv .7s linear infinite reverse}
+.pipe.gridon{opacity:.6;animation:dashmv 1s linear infinite}
+@keyframes dashmv{to{stroke-dashoffset:-40}}
+.cu rect{fill:#16223a;stroke:#26334d;stroke-width:1.5;transition:.4s}
+.cu .fan{fill:none;stroke:#33415a;stroke-width:2;transition:.4s;transform-box:fill-box;transform-origin:center}
+.cu.on rect{fill:rgba(20,184,166,.16);stroke:#14B8A6}
+.cu.on .fan{stroke:#5eead4;animation:spin 1.1s linear infinite}
+.cu.charging rect{fill:rgba(59,130,246,.18);stroke:#3B82F6}
+.cu.charging .fan{stroke:#93c5fd;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.chip{transition:fill .4s,opacity .4s}
+.heatwave{animation:rise 2.4s ease-in infinite;opacity:0}
+@keyframes rise{0%{opacity:.5;transform:translateY(0)}100%{opacity:0;transform:translateY(-26px)}}
 </style>
 </head>
 <body>
@@ -114,12 +110,11 @@
     <div class="stats">
       <div class="stat"><div class="l">Time</div><div class="v" id="stTime" style="color:var(--blue)">00:00</div></div>
       <div class="stat temp"><div class="l">Outside</div><div class="v" id="stTemp">66°</div></div>
-      <div class="stat"><div class="l">Main Meter</div><div class="v" id="stMeter" style="color:var(--grayL)">— </div></div>
+      <div class="stat"><div class="l">Main Meter</div><div class="v" id="stMeter" style="color:var(--white)">— </div></div>
       <div class="stat freed"><div class="l">Freed kW</div><div class="v" id="stFreed">0.0</div></div>
     </div>
   </div>
 
-  <!-- METER STRIP -->
   <div class="meterstrip">
     <div class="mtop">
       <div class="lab">Power at the <b>main meter</b> &mdash; IT compute + cooling, measured against the site cap</div>
@@ -141,162 +136,178 @@
     </div>
   </div>
 
-  <!-- MAIN STAGE -->
-  <div class="omain">
-    <div class="stage">
-      <!-- ====================== SCHEMATIC ====================== -->
-      <svg id="scene" viewBox="0 0 1160 600" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <filter id="soft" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-          </filter>
-          <linearGradient id="gTeal" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#14B8A6"/><stop offset="1" stop-color="#06B6D4"/></linearGradient>
-          <linearGradient id="gWarm" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#F97316"/><stop offset="1" stop-color="#EF4444"/></linearGradient>
-          <linearGradient id="gIce" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#14B8A6"/></linearGradient>
-          <radialGradient id="gSun"><stop offset="0" stop-color="#FBBF24" stop-opacity="1"/><stop offset="1" stop-color="#FBBF24" stop-opacity="0"/></radialGradient>
-          <clipPath id="tankClip"><rect x="80" y="160" width="132" height="236" rx="8"/></clipPath>
-        </defs>
+  <div class="stage">
+    <svg id="scene" viewBox="0 0 1200 620" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="soft" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <linearGradient id="gTeal" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#14B8A6"/><stop offset="1" stop-color="#06B6D4"/></linearGradient>
+        <linearGradient id="gTealV" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#14B8A6"/><stop offset="1" stop-color="#06B6D4"/></linearGradient>
+        <linearGradient id="gWarm" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#F97316"/><stop offset="1" stop-color="#EF4444"/></linearGradient>
+        <linearGradient id="gWarmV" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F97316"/><stop offset="1" stop-color="#EF4444"/></linearGradient>
+        <linearGradient id="gIce" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#14B8A6"/></linearGradient>
+        <radialGradient id="gSun"><stop offset="0" stop-color="#FBBF24" stop-opacity="1"/><stop offset="1" stop-color="#FBBF24" stop-opacity="0"/></radialGradient>
+        <clipPath id="tankClip"><rect x="148" y="290" width="252" height="200" rx="6"/></clipPath>
+      </defs>
 
-        <!-- sun / sky indicator -->
-        <circle id="sunGlow" cx="980" cy="86" r="70" fill="url(#gSun)" opacity="0.2"/>
-        <circle id="sunCore" cx="980" cy="86" r="20" fill="#FBBF24" opacity="0.3"/>
-        <text x="980" y="150" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" fill="#FBBF24" id="sunTemp" opacity="0.85">66°F</text>
+      <!-- sun / ambient temperature indicator -->
+      <circle id="sunGlow" cx="1150" cy="68" r="60" fill="url(#gSun)" opacity="0.2"/>
+      <circle id="sunCore" cx="1150" cy="68" r="18" fill="#FBBF24" opacity="0.3"/>
+      <text id="sunTemp" x="1150" y="118" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" fill="#FBBF24" opacity="0.85">66°F</text>
 
-        <!-- ===== PIPES (drawn first, under nodes) ===== -->
-        <!-- glycol: ice -> manifold -->
-        <path id="p_iceM" class="pipe rev" d="M212 348 H300 V300" stroke="url(#gTeal)"/>
-        <!-- glycol: chiller -> manifold -->
-        <path id="p_chillM" class="pipe rev" d="M300 470 V300 H300" stroke="url(#gTeal)"/>
-        <!-- manifold -> HX (cold supply) -->
-        <path id="p_mHX" class="pipe rev" d="M300 300 H470" stroke="url(#gTeal)"/>
-        <!-- HX -> manifold warm return (top) -->
-        <path id="p_hxRet" class="pipe" d="M470 250 H336 V300" stroke="url(#gWarm)"/>
-        <!-- charge: chiller -> ice (freeze) -->
-        <path id="p_freeze" class="pipe" d="M150 430 V396" stroke="url(#gIce)"/>
-        <!-- water: HX -> DC (cold supply, bottom) -->
-        <path id="p_sup" class="pipe" d="M566 360 H760" stroke="url(#gTeal)"/>
-        <!-- water: DC -> HX (warm return, top) -->
-        <path id="p_ret" class="pipe rev" d="M760 250 H566" stroke="url(#gWarm)"/>
-        <!-- grid trunk -> chiller -->
-        <path id="p_grid" class="pipe gridpipe" d="M120 106 V126 H44 V508 H60" stroke="#3B82F6"/>
-        <!-- grid trunk -> DC (IT load) -->
-        <path id="p_gridIT" class="pipe gridpipe" d="M210 78 H910 V180" stroke="#3B82F6"/>
+      <!-- ====================== MAIN METER — top centre ====================== -->
+      <g id="mainMeter">
+        <rect x="560" y="20" width="280" height="62" rx="12" fill="#0d1830" stroke="#3B82F6" stroke-width="2"/>
+        <text x="700" y="44" text-anchor="middle" font-family="Outfit,sans-serif" font-size="14" font-weight="800" fill="#93c5fd">MAIN METER</text>
+        <text x="700" y="62" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#475569">site power · 32 MW cap</text>
+        <!-- grid glow bar inside meter box -->
+        <rect x="572" y="70" width="256" height="4" rx="2" fill="url(#gTeal)" opacity="0.3"/>
+      </g>
 
-        <!-- ===== GRID ===== -->
-        <g>
-          <rect x="60" y="50" width="150" height="56" rx="10" fill="#101a2e" stroke="#2b3a55" stroke-width="1.5"/>
-          <text x="135" y="74" text-anchor="middle" font-family="Outfit,sans-serif" font-size="13" font-weight="800" fill="#cbd5e1">GRID SUPPLY</text>
-          <text x="135" y="92" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#64748b">main meter</text>
+      <!-- ====================== GRID POWER LINES from Main Meter ====================== -->
+      <!-- trunk down to Nostromo zone -->
+      <path id="p_gridL" class="pipe gridpipe" d="M620 82 V110 H200 V150" stroke="#3B82F6"/>
+      <!-- trunk down to DC zone -->
+      <path id="p_gridR" class="pipe gridpipe" d="M780 82 V110 H1060 V168" stroke="#3B82F6"/>
+
+      <!-- ====================== LEFT ZONE: NOSTROMO SYSTEM ====================== -->
+      <!-- Zone label -->
+      <text x="270" y="138" text-anchor="middle" font-family="Outfit,sans-serif" font-size="12" font-weight="700" fill="#14B8A6" letter-spacing="1.5">NOSTROMO SYSTEM</text>
+
+      <!-- NOSTROMO CHILLER — 3 unit cells -->
+      <g id="nostromoChiller">
+        <rect x="100" y="150" width="340" height="110" rx="12" fill="#0d1626" stroke="#2b3a55" stroke-width="1.5"/>
+        <text x="270" y="174" text-anchor="middle" font-family="Outfit,sans-serif" font-size="13" font-weight="800" fill="#cbd5e1">NOSTROMO CHILLER</text>
+        <g id="nchillers">
+          <g class="cu" data-i="0"><rect x="118" y="186" width="88" height="56" rx="7"/><circle class="fan" cx="162" cy="214" r="15"/></g>
+          <g class="cu" data-i="1"><rect x="226" y="186" width="88" height="56" rx="7"/><circle class="fan" cx="270" cy="214" r="15"/></g>
+          <g class="cu" data-i="2"><rect x="334" y="186" width="88" height="56" rx="7"/><circle class="fan" cx="378" cy="214" r="15"/></g>
         </g>
+      </g>
 
-        <!-- ===== ICEBRICKS TANK ===== -->
-        <g>
-          <rect x="70" y="150" width="152" height="256" rx="12" fill="#0d1626" stroke="#2b3a55" stroke-width="2"/>
-          <!-- soc fill (clipped) -->
-          <g clip-path="url(#tankClip)">
-            <rect id="socFill" x="80" y="280" width="132" height="116" fill="url(#gIce)" opacity="0.55"/>
-            <rect id="socShine" x="80" y="278" width="132" height="4" fill="#a5f3fc" opacity="0.6"/>
-            <!-- ice block lines -->
-            <g stroke="#0d1626" stroke-width="2" opacity="0.4">
-              <line x1="80" y1="190" x2="212" y2="190"/><line x1="80" y1="230" x2="212" y2="230"/>
-              <line x1="80" y1="270" x2="212" y2="270"/><line x1="80" y1="310" x2="212" y2="310"/>
-              <line x1="80" y1="350" x2="212" y2="350"/>
-              <line x1="113" y1="160" x2="113" y2="396"/><line x1="146" y1="160" x2="146" y2="396"/><line x1="179" y1="160" x2="179" y2="396"/>
-            </g>
-          </g>
-          <text x="146" y="138" text-anchor="middle" font-family="Outfit,sans-serif" font-size="14" font-weight="800" fill="#5eead4">ICEBRICKS</text>
-          <text id="storeLabel" x="146" y="424" text-anchor="middle" font-family="Outfit,sans-serif" font-size="10" fill="#64748b">thermal store · 32°F</text>
-          <text id="socPct" x="146" y="288" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="26" font-weight="700" fill="#ffffff">62%</text>
-          <text x="146" y="306" text-anchor="middle" font-family="Outfit,sans-serif" font-size="9" fill="#94a3b8" letter-spacing="1">STATE OF CHARGE</text>
-        </g>
+      <!-- Nostromo loop: chiller -> ice bricks (freeze pipe, going down with elbow) -->
+      <path id="p_freeze" class="pipe" d="M378 214 H420 V370 H402" stroke="url(#gIce)"/>
 
-        <!-- ===== CHILLER PLANT ===== -->
-        <g>
-          <rect x="60" y="430" width="240" height="140" rx="12" fill="#0d1626" stroke="#2b3a55" stroke-width="2"/>
-          <text x="180" y="455" text-anchor="middle" font-family="Outfit,sans-serif" font-size="14" font-weight="800" fill="#cbd5e1">CHILLER PLANT</text>
-          <!-- 6 chiller units -->
-          <g id="chillers">
-            <g class="cu" data-i="0"><rect x="78"  y="470" width="60" height="40" rx="6"/><circle class="fan" cx="108" cy="490" r="11"/></g>
-            <g class="cu" data-i="1"><rect x="150" y="470" width="60" height="40" rx="6"/><circle class="fan" cx="180" cy="490" r="11"/></g>
-            <g class="cu" data-i="2"><rect x="222" y="470" width="60" height="40" rx="6"/><circle class="fan" cx="252" cy="490" r="11"/></g>
-            <g class="cu" data-i="3"><rect x="78"  y="520" width="60" height="40" rx="6"/><circle class="fan" cx="108" cy="540" r="11"/></g>
-            <g class="cu" data-i="4"><rect x="150" y="520" width="60" height="40" rx="6"/><circle class="fan" cx="180" cy="540" r="11"/></g>
-            <g class="cu" data-i="5"><rect x="222" y="520" width="60" height="40" rx="6"/><circle class="fan" cx="252" cy="540" r="11"/></g>
+      <!-- ICE BRICKS TANK -->
+      <g id="iceBricks">
+        <rect x="138" y="285" width="264" height="216" rx="12" fill="#0d1626" stroke="#2b3a55" stroke-width="2"/>
+        <text x="270" y="310" text-anchor="middle" font-family="Outfit,sans-serif" font-size="14" font-weight="800" fill="#5eead4">ICEBRICKS</text>
+        <!-- soc fill (clipped) -->
+        <g clip-path="url(#tankClip)">
+          <rect id="socFill" x="148" y="390" width="252" height="100" fill="url(#gIce)" opacity="0.55"/>
+          <rect id="socShine" x="148" y="388" width="252" height="4" fill="#a5f3fc" opacity="0.6"/>
+          <!-- ice grid lines -->
+          <g stroke="#0d1626" stroke-width="1.5" opacity="0.35">
+            <line x1="148" y1="320" x2="400" y2="320"/>
+            <line x1="148" y1="350" x2="400" y2="350"/>
+            <line x1="148" y1="380" x2="400" y2="380"/>
+            <line x1="148" y1="410" x2="400" y2="410"/>
+            <line x1="148" y1="440" x2="400" y2="440"/>
+            <line x1="148" y1="470" x2="400" y2="470"/>
+            <line x1="189" y1="290" x2="189" y2="490"/>
+            <line x1="230" y1="290" x2="230" y2="490"/>
+            <line x1="272" y1="290" x2="272" y2="490"/>
+            <line x1="314" y1="290" x2="314" y2="490"/>
+            <line x1="356" y1="290" x2="356" y2="490"/>
           </g>
         </g>
+        <text id="socPct" x="270" y="406" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="32" font-weight="700" fill="#ffffff">62%</text>
+        <text x="270" y="428" text-anchor="middle" font-family="Outfit,sans-serif" font-size="9" fill="#94a3b8" letter-spacing="1.2">STATE OF CHARGE</text>
+        <text id="storeLabel" x="270" y="484" text-anchor="middle" font-family="Outfit,sans-serif" font-size="11" fill="#64748b">thermal store</text>
+      </g>
 
-        <!-- ===== MANIFOLD junction ===== -->
-        <circle cx="300" cy="300" r="7" fill="#1b2436" stroke="#14B8A6" stroke-width="2"/>
+      <!-- Nostromo loop: ice -> HX (cold supply, going right) -->
+      <path id="p_iceHX" class="pipe rev" d="M402 390 H490 V380" stroke="url(#gTeal)"/>
+      <!-- Nostromo loop: HX warm return -> chiller (going left, upper) -->
+      <path id="p_hxChill" class="pipe" d="M470 350 H440 V240 H270 V260" stroke="url(#gWarm)"/>
+      <!-- Nostromo loop: chiller output -> tank (loop closed) -->
+      <path id="p_chillIce" class="pipe rev" d="M100 214 V390 H138" stroke="url(#gTeal)"/>
 
-        <!-- ===== HEAT EXCHANGER ===== -->
-        <g>
-          <rect x="470" y="218" width="96" height="190" rx="12" fill="#0d1626" stroke="#3B82F6" stroke-width="2"/>
-          <g id="hxCoils" stroke-width="3" fill="none" stroke-linecap="round">
-            <path d="M484 250 H552" stroke="#14B8A6"/>
-            <path d="M484 285 H552" stroke="#F97316"/>
-            <path d="M484 320 H552" stroke="#14B8A6"/>
-            <path d="M484 355 H552" stroke="#F97316"/>
-            <path d="M484 385 H552" stroke="#14B8A6"/>
-          </g>
-          <text x="518" y="208" text-anchor="middle" font-family="Outfit,sans-serif" font-size="12" font-weight="800" fill="#93c5fd">HEAT EXCHANGER</text>
+      <!-- ====================== HEAT EXCHANGER — centre ====================== -->
+      <g id="heatExchanger">
+        <rect x="470" y="295" width="120" height="180" rx="12" fill="#0d1626" stroke="#3B82F6" stroke-width="2"/>
+        <text x="530" y="316" text-anchor="middle" font-family="Outfit,sans-serif" font-size="11" font-weight="800" fill="#93c5fd">HEAT</text>
+        <text x="530" y="330" text-anchor="middle" font-family="Outfit,sans-serif" font-size="11" font-weight="800" fill="#93c5fd">EXCHANGER</text>
+        <!-- HX coil lines alternating cold/warm -->
+        <g stroke-width="3" fill="none" stroke-linecap="round">
+          <path d="M484 344 H546" stroke="#14B8A6"/>
+          <path d="M484 364 H546" stroke="#F97316"/>
+          <path d="M484 384 H546" stroke="#14B8A6"/>
+          <path d="M484 404 H546" stroke="#F97316"/>
+          <path d="M484 424 H546" stroke="#14B8A6"/>
+          <path d="M484 444 H546" stroke="#F97316"/>
         </g>
+        <text x="530" y="462" text-anchor="middle" font-family="Outfit,sans-serif" font-size="12" fill="#94A3B8" letter-spacing="1">COLD HANDOFF</text>
+      </g>
 
-        <!-- temp tags on water side -->
-        <g font-family="JetBrains Mono,monospace" font-weight="700">
-          <rect x="628" y="236" width="74" height="26" rx="6" fill="rgba(239,68,68,.12)" stroke="rgba(249,115,22,.5)"/>
-          <text x="665" y="253" text-anchor="middle" font-size="13" fill="#fb923c">70°F</text>
-          <text x="665" y="226" text-anchor="middle" font-family="Outfit,sans-serif" font-size="9" font-weight="600" fill="#94a3b8">RETURN</text>
+      <!-- ====================== RIGHT ZONE: DATA CENTRE ====================== -->
+      <!-- Zone label -->
+      <text x="1050" y="155" text-anchor="middle" font-family="Outfit,sans-serif" font-size="12" font-weight="700" fill="#475569" letter-spacing="1.5">DATA CENTRE</text>
 
-          <rect x="628" y="346" width="74" height="26" rx="6" fill="rgba(20,184,166,.12)" stroke="rgba(20,184,166,.5)"/>
-          <text x="665" y="363" text-anchor="middle" font-size="13" fill="#5eead4">60°F</text>
-          <text x="665" y="388" text-anchor="middle" font-family="Outfit,sans-serif" font-size="9" font-weight="600" fill="#94a3b8">SUPPLY</text>
+      <!-- CHILLER PLANT — 6 units -->
+      <g id="chillerPlant">
+        <rect x="730" y="168" width="360" height="150" rx="12" fill="#0d1626" stroke="#2b3a55" stroke-width="1.5"/>
+        <text x="910" y="192" text-anchor="middle" font-family="Outfit,sans-serif" font-size="13" font-weight="800" fill="#cbd5e1">CHILLER PLANT</text>
+        <g id="chillers">
+          <g class="cu" data-i="0"><rect x="748" y="202" width="76" height="48" rx="7"/><circle class="fan" cx="786" cy="226" r="14"/></g>
+          <g class="cu" data-i="1"><rect x="836" y="202" width="76" height="48" rx="7"/><circle class="fan" cx="874" cy="226" r="14"/></g>
+          <g class="cu" data-i="2"><rect x="924" y="202" width="76" height="48" rx="7"/><circle class="fan" cx="962" cy="226" r="14"/></g>
+          <g class="cu" data-i="3"><rect x="1012" y="202" width="76" height="48" rx="7"/><circle class="fan" cx="1050" cy="226" r="14"/></g>
+          <g class="cu" data-i="4"><rect x="836" y="258" width="76" height="48" rx="7"/><circle class="fan" cx="874" cy="282" r="14"/></g>
+          <g class="cu" data-i="5"><rect x="924" y="258" width="76" height="48" rx="7"/><circle class="fan" cx="962" cy="282" r="14"/></g>
         </g>
+      </g>
 
-        <!-- ===== DATA CENTER ===== -->
-        <g>
-          <rect x="760" y="178" width="320" height="252" rx="14" fill="#0d1626" stroke="#2b3a55" stroke-width="2"/>
-          <text x="920" y="204" text-anchor="middle" font-family="Outfit,sans-serif" font-size="15" font-weight="800" fill="#cbd5e1">DATA CENTER</text>
-          <text x="920" y="220" text-anchor="middle" font-family="Outfit,sans-serif" font-size="10" fill="#64748b">servers + accelerators</text>
-          <!-- server racks with chips -->
-          <g id="racks">
-            <!-- each rack: outline + chip rows that glow with heat -->
-            <g class="rack"><rect x="790" y="238" width="80" height="170" rx="8" fill="#101a2e" stroke="#26334d"/></g>
-            <g class="rack"><rect x="880" y="238" width="80" height="170" rx="8" fill="#101a2e" stroke="#26334d"/></g>
-            <g class="rack"><rect x="970" y="238" width="80" height="170" rx="8" fill="#101a2e" stroke="#26334d"/></g>
-          </g>
-          <g id="chips"></g>
-          <text id="dcLoad" x="920" y="424" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#94a3b8">IT load 20.0 MW</text>
-        </g>
+      <!-- Building water loop: HX cold supply -> chiller plant input -->
+      <path id="p_sup" class="pipe" d="M590 380 H680 V340 H730" stroke="url(#gTeal)"/>
+      <!-- Building water loop: chiller plant output -> CDU -->
+      <path id="p_bldSup" class="pipe" d="M910 318 V356" stroke="url(#gTealV)"/>
+      <!-- Building water loop warm return: CDU -> chiller plant -> HX -->
+      <path id="p_ret" class="pipe rev" d="M730 290 H680 V468 H590" stroke="url(#gWarm)"/>
+      <!-- HX building side return input: warm return enters HX right side, runs up to HX warm outlet -->
+      <path id="p_hxBldRet" class="pipe rev" d="M590 468 V310" stroke="url(#gWarm)"/>
 
-        <!-- (charging state shown on the store label) -->
-      </svg>
+      <!-- CDU / COOLING LOOP -->
+      <g id="cdu">
+        <rect x="730" y="356" width="360" height="80" rx="12" fill="#0d1626" stroke="#26334d" stroke-width="1.5"/>
+        <text x="910" y="383" text-anchor="middle" font-family="Outfit,sans-serif" font-size="13" font-weight="800" fill="#cbd5e1">DLC / CDU</text>
+        <text x="910" y="399" text-anchor="middle" font-family="Outfit,sans-serif" font-size="10" fill="#475569">(optional) · direct liquid cooling loop</text>
+        <!-- flow arrows suggestion -->
+        <path d="M770 418 H1050" stroke="#14B8A6" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.4"/>
+        <text x="800" y="428" font-family="Outfit,sans-serif" font-size="9" fill="#14B8A6" opacity="0.6">cold</text>
+        <text x="980" y="428" font-family="Outfit,sans-serif" font-size="9" fill="#F97316" opacity="0.6">warm</text>
+      </g>
 
-      <div class="legend-stage">
-        <span><i style="background:linear-gradient(90deg,#14B8A6,#06B6D4)"></i>cold flow</span>
-        <span><i style="background:linear-gradient(90deg,#F97316,#EF4444)"></i>warm return</span>
-        <span><i style="background:#3B82F6"></i>grid power</span>
-      </div>
-    </div>
+      <!-- CDU -> servers (cold supply) -->
+      <path id="p_cduSup" class="pipe" d="M910 436 V460" stroke="url(#gTealV)"/>
+      <!-- servers warm return -> CDU -->
+      <path id="p_srvRet" class="pipe rev" d="M800 460 V444" stroke="url(#gWarmV)"/>
 
-    <!-- SIDE INSIGHT -->
-    <div class="side">
-      <div class="icard flex" id="insight">
-        <div class="ck" id="inK">PHASE 01</div>
-        <div class="ct" id="inT">Overnight — charging the store</div>
-        <div class="cb" id="inB">Press play to watch a full design day. Cool night air and spare capacity under the cap let the chillers run efficiently and <b class="t">freeze the IceBricks</b> for the day ahead.</div>
-        <div class="metrics">
-          <div class="mtile soc"><div class="ml">Store SOC</div><div class="mv" id="mSoc" style="color:var(--teal)">62%</div></div>
-          <div class="mtile chill"><div class="ml">Chillers on</div><div class="mv" id="mChill" style="color:var(--red)">4 / 6</div></div>
-        </div>
-      </div>
-      <div class="icard">
-        <div class="ck">The takeaway</div>
-        <div class="cb" id="takeaway">On the hottest hours, <b class="t">stored cooling does the work</b> and chillers throttle down — the meter slides away from the cap and that headroom becomes <b class="g">sellable compute</b>.</div>
-      </div>
+      <!-- SERVERS / CHIPS -->
+      <g id="serverZone">
+        <rect x="730" y="460" width="360" height="130" rx="12" fill="#0d1626" stroke="#2b3a55" stroke-width="1.5"/>
+        <text x="910" y="484" text-anchor="middle" font-family="Outfit,sans-serif" font-size="13" font-weight="800" fill="#cbd5e1">SERVERS / CHIPS</text>
+        <text id="dcLoad" x="910" y="500" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#64748b">IT load 20.0 MW</text>
+        <!-- server racks -->
+        <g class="rack"><rect x="748" y="508" width="98" height="72" rx="7" fill="#101a2e" stroke="#26334d"/></g>
+        <g class="rack"><rect x="856" y="508" width="98" height="72" rx="7" fill="#101a2e" stroke="#26334d"/></g>
+        <g class="rack"><rect x="964" y="508" width="98" height="72" rx="7" fill="#101a2e" stroke="#26334d"/></g>
+      </g>
+      <g id="chips"></g>
+
+      <!-- heat waves above server zone -->
+      <g id="hwaves"></g>
+
+    </svg>
+
+    <div class="legend-stage">
+      <span><i style="background:linear-gradient(90deg,#14B8A6,#06B6D4)"></i>cold flow</span>
+      <span><i style="background:linear-gradient(90deg,#F97316,#EF4444)"></i>warm return</span>
+      <span><i style="background:#3B82F6"></i>grid power</span>
     </div>
   </div>
 
-  <!-- CONTROLS -->
   <div class="controls">
     <button class="pbtn" id="play">▶</button>
     <div class="tlwrap">
@@ -312,50 +323,26 @@
 
 <div class="footer"><b>Nostromo Energy</b> — operational showcase · illustrative design-day model</div>
 
-<style>
-/* pipe + chiller animation */
-.pipe{fill:none;stroke-width:6;stroke-linecap:round;stroke-dasharray:12 9;opacity:.16;transition:opacity .45s,stroke-width .45s}
-.pipe.gridpipe{stroke-width:3;stroke-dasharray:7 7}
-.pipe.on{opacity:1;animation:dashmv .7s linear infinite}
-.pipe.on.rev{animation:dashmv .7s linear infinite reverse}
-.pipe.gridon{opacity:.6;animation:dashmv 1s linear infinite}
-@keyframes dashmv{to{stroke-dashoffset:-40}}
-.cu rect{fill:#16223a;stroke:#26334d;stroke-width:1.5;transition:.4s}
-.cu .fan{fill:none;stroke:#33415a;stroke-width:2;transition:.4s;transform-box:fill-box;transform-origin:center}
-.cu.on rect{fill:rgba(20,184,166,.16);stroke:#14B8A6}
-.cu.on .fan{stroke:#5eead4;animation:spin 1.1s linear infinite}
-.cu.charging rect{fill:rgba(59,130,246,.18);stroke:#3B82F6}
-.cu.charging .fan{stroke:#93c5fd;animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.chip{transition:fill .4s,opacity .4s}
-.heatwave{animation:rise 2.4s ease-in infinite;opacity:0}
-@keyframes rise{0%{opacity:.5;transform:translateY(0)}100%{opacity:0;transform:translateY(-26px)}}
-</style>
-
 <script>
 document.addEventListener('DOMContentLoaded',function(){
   var CAP=32, IT=20, BUF=0.6, MAXCH=12, OFFMAX=7;
   var $=function(id){return document.getElementById(id)};
 
-  // ---------- model ----------
   function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
-  function temp(h){ // °F, min ~05:00, peak ~16:00
-    var hh=h, t;
+  function temp(h){
+    var hh=h;
     if(hh<5) hh+=24;
-    // map 5..(5+24) ; peak at 16
-    var x=(hh-5)/24; // 0..1 over the day from 5am
-    // cosine bump peaking ~ at 16:00 => x at 16 is (16-5)/24=0.458
+    var x=(hh-5)/24;
     var peakx=0.458, w=0.62;
     var base=64, amp=31;
-    var v=Math.cos((x-peakx)/w*Math.PI); v=(v+1)/2; // 0..1
+    var v=Math.cos((x-peakx)/w*Math.PI); v=(v+1)/2;
     return base+amp*Math.pow(v,1.1);
   }
   function isCharge(h){return h>=22||h<8}
   function isDischarge(h){return h>=12&&h<20}
   function soc(h){
-    // charge 22->8 (10h) from 0.10 to 1 ; hold 8->12 ; discharge 12->20 to 0.12 ; hold 20->22
     if(h>=22) return clamp(0.10+(h-22)/10*0.90,0,1);
-    if(h<8)   return clamp(0.10+(h+2)/10*0.90,0,1);   // continues from 22:00 baseline (22->24 is 2h)
+    if(h<8)   return clamp(0.10+(h+2)/10*0.90,0,1);
     if(h<12)  return 1;
     if(h<20)  return clamp(1-(h-12)/8*0.88,0.12,1);
     return 0.12;
@@ -363,9 +350,9 @@ document.addEventListener('DOMContentLoaded',function(){
   function state(h){
     var T=temp(h);
     var coolFrac=clamp((T-60)/(98-60),0,1);
-    var chRaw=4+8*coolFrac;                 // chiller MW if no storage
+    var chRaw=4+8*coolFrac;
     var s=soc(h), charging=isCharge(h), discharging=isDischarge(h);
-    var pacing=clamp(s/0.15,0,1);           // SOC pacing: offset fades as store drains
+    var pacing=clamp(s/0.15,0,1);
     var off= discharging ? Math.min(chRaw-2.5, OFFMAX)*pacing : 0;
     var chEff=Math.max(2, chRaw-off);
     var chargeKW=0;
@@ -374,7 +361,7 @@ document.addEventListener('DOMContentLoaded',function(){
       chargeKW=clamp(Math.min(3.6,headroom),0,3.6);
     }
     var meter=IT+chEff+chargeKW;
-    var meterNoStore=IT+chRaw;              // what it would be w/o storage (peak hours)
+    var meterNoStore=IT+chRaw;
     var freed=Math.max(0,CAP-meter);
     var phase = charging?'charge' : discharging?'discharge' : (h>=8&&h<12?'standby':'recover');
     var chillFrac = (charging? (chRaw+chargeKW): chEff)/MAXCH;
@@ -383,61 +370,68 @@ document.addEventListener('DOMContentLoaded',function(){
       freed:freed,phase:phase,chillFrac:clamp(chillFrac,0,1),off:off};
   }
 
-  // ---------- build chips ----------
+  // build chips inside server racks
   (function(){
-    var g=$('chips'), html='';
-    var racks=[790,880,970];
-    racks.forEach(function(rx){
-      for(var r=0;r<5;r++){
-        var y=252+r*30;
-        html+='<rect class="chip" x="'+(rx+12)+'" y="'+y+'" width="56" height="16" rx="3" fill="#ef4444" opacity="0.5"/>';
+    var g=$('chips'), hw=$('hwaves'), html='', hwhtml='';
+    var racks=[{x:748,y:508},{x:856,y:508},{x:964,y:508}];
+    racks.forEach(function(rk){
+      for(var r=0;r<4;r++){
+        var cy=rk.y+12+r*16;
+        html+='<rect class="chip" x="'+(rk.x+8)+'" y="'+cy+'" width="82" height="10" rx="2" fill="#ef4444" opacity="0.5"/>';
       }
     });
-    // heat waves
-    for(var i=0;i<4;i++){
-      var x=805+i*70;
-      html+='<path class="heatwave" id="hw'+i+'" d="M'+x+' 238 q6 -8 0 -16 q-6 -8 0 -16" stroke="#f97316" stroke-width="2" fill="none" style="animation-delay:'+(i*0.5)+'s"/>';
+    for(var i=0;i<3;i++){
+      var cx=797+i*108;
+      hwhtml+='<path class="heatwave" d="M'+cx+' 508 q5 -7 0 -14 q-5 -7 0 -14" stroke="#f97316" stroke-width="2" fill="none" style="animation-delay:'+(i*0.6)+'s"/>';
     }
     g.innerHTML=html;
+    hw.innerHTML=hwhtml;
   })();
 
-  // ---------- pipes registry ----------
   var pipes={
-    iceM:$('p_iceM'), chillM:$('p_chillM'), mHX:$('p_mHX'), hxRet:$('p_hxRet'),
-    freeze:$('p_freeze'), sup:$('p_sup'), ret:$('p_ret'), grid:$('p_grid'), gridIT:$('p_gridIT')
+    gridL:$('p_gridL'), gridR:$('p_gridR'),
+    freeze:$('p_freeze'), iceHX:$('p_iceHX'), hxChill:$('p_hxChill'), chillIce:$('p_chillIce'),
+    sup:$('p_sup'), bldSup:$('p_bldSup'), ret:$('p_ret'), hxBldRet:$('p_hxBldRet'),
+    cduSup:$('p_cduSup'), srvRet:$('p_srvRet')
   };
-  function setPipe(p,on,grid){ p.classList.toggle(grid?'gridon':'on',on); if(!on){p.classList.remove('on');p.classList.remove('gridon');} }
+  function setPipe(p,on,grid){
+    if(!p) return;
+    if(grid){
+      p.classList.toggle('gridon',on);
+      if(!on) p.classList.remove('gridon');
+    } else {
+      p.classList.toggle('on',on);
+      if(!on) p.classList.remove('on');
+    }
+  }
 
-  var cus=[].slice.call(document.querySelectorAll('.cu'));
+  var cus=[].slice.call(document.querySelectorAll('#chillers .cu'));
+  var ncus=[].slice.call(document.querySelectorAll('#nchillers .cu'));
   var chipsEls=[].slice.call(document.querySelectorAll('.chip'));
 
-  function lerpColor(a,b,t){ // a,b = [r,g,b]
+  function lerpColor(a,b,t){
     return 'rgb('+Math.round(a[0]+(b[0]-a[0])*t)+','+Math.round(a[1]+(b[1]-a[1])*t)+','+Math.round(a[2]+(b[2]-a[2])*t)+')';
   }
 
-  // ---------- draw ----------
   function fmt(n){return n.toFixed(1)}
   function draw(h){
     var st=state(h);
     var hh=Math.floor(h), mm=Math.floor((h-hh)*60);
     var tstr=String(hh).padStart(2,'0')+':'+String(mm).padStart(2,'0');
 
-    // top stats
     $('stTime').textContent=tstr;
     $('stTemp').textContent=Math.round(st.T)+'°';
     $('stMeter').textContent=fmt(st.meter);
-    $('stMeter').style.color = st.meter>CAP-0.4?'var(--red)':'var(--grayL)';
+    $('stMeter').style.color = st.meter>CAP-0.4?'var(--red)':'var(--white)';
     $('stFreed').textContent=fmt(st.freed);
 
-    // phase pill
     var pill=$('phasePill');
     var labels={charge:'● Charging',standby:'● Charged · holding',discharge:'● Discharging',recover:'● Resetting'};
     pill.className='phase-pill '+st.phase;
     pill.textContent=labels[st.phase];
 
-    // ---- meter bar ----
-    var W=$('bar').clientWidth||760;
-    var sc=W/(CAP*1.06);              // px per MW (a little headroom past cap)
+    var W=$('bar').clientWidth||900;
+    var sc=W/(CAP*1.06);
     var xIT=IT*sc;
     $('segIT').style.width=xIT+'px';
     var chW=st.chEff*sc;
@@ -447,43 +441,51 @@ document.addEventListener('DOMContentLoaded',function(){
     var chgW=st.chargeKW*sc;
     $('segCharge').style.left=chgX+'px'; $('segCharge').style.width=chgW+'px';
     $('segChargeTxt').textContent= chgW>46? 'charge '+fmt(st.chargeKW):'';
-    // freed segment from meter -> cap
     var meterX=(IT+st.chEff+st.chargeKW)*sc;
     var freedW=Math.max(0,(CAP-st.meter)*sc);
     $('segFreed').style.left=meterX+'px'; $('segFreed').style.width=freedW+'px';
     $('segFreedTxt').textContent= (st.freed>1.2 && freedW>74)? '+'+fmt(st.freed)+' MW freed':'';
-    // cap line
     $('capLine').style.left=(CAP*sc)+'px';
-    // without-storage marker (only when storage is acting)
     var ns=$('noStore');
     if(st.off>0.4){ ns.style.left=(st.meterNoStore*sc)+'px'; ns.style.opacity=1; }
     else ns.style.opacity=0;
 
-    // ---- sun / temp ----
     var heat=st.coolFrac;
     $('sunGlow').setAttribute('opacity',(0.12+heat*0.55).toFixed(2));
-    $('sunGlow').setAttribute('r',(46+heat*46).toFixed(0));
+    $('sunGlow').setAttribute('r',(40+heat*44).toFixed(0));
     $('sunCore').setAttribute('opacity',(0.25+heat*0.7).toFixed(2));
-    $('sunCore').setAttribute('r',(16+heat*8).toFixed(0));
+    $('sunCore').setAttribute('r',(14+heat*8).toFixed(0));
     $('sunTemp').textContent=Math.round(st.T)+'°F';
 
-    // ---- icebricks SOC ----
-    var top=160, full=236;
-    var fh=st.soc*full;
-    $('socFill').setAttribute('y',(top+full-fh).toFixed(1));
+    // icebricks SOC (tank: y=290, height=200)
+    var tankTop=290, tankH=200;
+    var fh=st.soc*tankH;
+    $('socFill').setAttribute('y',(tankTop+tankH-fh).toFixed(1));
     $('socFill').setAttribute('height',fh.toFixed(1));
-    $('socShine').setAttribute('y',(top+full-fh-2).toFixed(1));
+    $('socShine').setAttribute('y',(tankTop+tankH-fh-2).toFixed(1));
     $('socPct').textContent=Math.round(st.soc*100)+'%';
 
-    // ---- chillers ----
-    var onCount = st.charging ? Math.round(st.chillFrac*6) : Math.round(st.chillFrac*6);
-    onCount=clamp(onCount,(st.charging?2:0),6);
+    // store label
+    var sl=$('storeLabel');
+    if(st.charging){ sl.textContent='❄ charging'; sl.setAttribute('fill','#22d3ee'); }
+    else if(st.discharging){ sl.textContent='discharging'; sl.setAttribute('fill','#14B8A6'); }
+    else { sl.textContent='thermal store'; sl.setAttribute('fill','#64748b'); }
+
+    // DC chiller plant (6 units)
+    var onCount=clamp(Math.round(st.chillFrac*6),0,6);
     cus.forEach(function(cu,i){
-      cu.classList.toggle('on', i<onCount && !st.charging);
-      cu.classList.toggle('charging', i<onCount && st.charging);
+      cu.classList.toggle('on', i<onCount);
+      cu.classList.remove('charging');
     });
 
-    // ---- chips heat color (cooler->hotter) ----
+    // Nostromo chillers (3 units) — animate with charging state
+    var nOn=st.charging ? 3 : (st.discharging ? 0 : 1);
+    ncus.forEach(function(cu,i){
+      cu.classList.toggle('charging', st.charging && i<nOn);
+      cu.classList.toggle('on', !st.charging && i<nOn);
+    });
+
+    // chip heat colour
     var cool=[34,197,94], warm=[239,68,68];
     chipsEls.forEach(function(c,i){
       var jitter=((i*37)%10)/40;
@@ -492,42 +494,22 @@ document.addEventListener('DOMContentLoaded',function(){
       c.setAttribute('opacity',(0.4+hk*0.5).toFixed(2));
     });
 
-    // ---- pipes ----
-    // grid always feeding (IT + chiller)
-    setPipe(pipes.grid,true,true); setPipe(pipes.gridIT,true,true);
-    // water loop always running (DC always needs cooling)
-    setPipe(pipes.sup,true,false); setPipe(pipes.ret,true,false);
-    setPipe(pipes.mHX,true,false); setPipe(pipes.hxRet,true,false);
-    // source selection
+    // pipes
+    setPipe(pipes.gridL,true,true); setPipe(pipes.gridR,true,true);
+    // building water loop always running
+    setPipe(pipes.sup,true,false); setPipe(pipes.bldSup,true,false);
+    setPipe(pipes.ret,true,false); setPipe(pipes.hxBldRet,true,false);
+    setPipe(pipes.cduSup,true,false); setPipe(pipes.srvRet,true,false);
+    // Nostromo loop
     setPipe(pipes.freeze, st.charging, false);
-    setPipe(pipes.iceM, st.discharging, false);
-    setPipe(pipes.chillM, !st.discharging, false);   // chiller feeds when not discharging
-    var sl=$('storeLabel');
-    if(st.charging){ sl.textContent='❄ charging · 32°F'; sl.setAttribute('fill','#22d3ee'); }
-    else { sl.textContent='thermal store · 32°F'; sl.setAttribute('fill','#64748b'); }
+    setPipe(pipes.chillIce, st.charging, false);
+    setPipe(pipes.iceHX, st.discharging, false);
+    setPipe(pipes.hxChill, st.discharging || st.charging, false);
 
-    // ---- side insight ----
-    $('mSoc').textContent=Math.round(st.soc*100)+'%';
-    $('mChill').textContent=onCount+' / 6';
-    var ins=$('insight');
-    ins.classList.toggle('glow', st.discharge);
-    var copy={
-      charge:['PHASE · OVERNIGHT','Charging the store',
-        'Cool night air keeps chiller efficiency (COP) high and the meter has spare room under the cap. The plant runs to <b class="t">freeze the IceBricks</b> — banking cold for tomorrow\'s peak.'],
-      standby:['PHASE · MORNING','Charged and holding',
-        'The store sits full at 32°F. Chillers handle the live load directly while the day heats up. <b>Nothing discharged yet</b> — we\'re saving it for the hours that matter.'],
-      discharge:['PHASE · AFTERNOON PEAK','Discharging into the heat',
-        'Outside temperature peaks, so cooling demand spikes. Instead of chillers pulling more grid power, <b class="t">stored cooling carries the load</b> — chillers throttle down and the meter drops, freeing <b class="g">'+fmt(st.freed)+' MW</b> for compute.'],
-      recover:['PHASE · EVENING','Peak over, resetting',
-        'The store is nearly spent and the peak has passed. Chillers resume normal duty as temperatures fall, getting ready to <b class="t">recharge overnight</b>.']
-    }[st.phase];
-    $('inK').textContent=copy[0]; $('inT').textContent=copy[1]; $('inB').innerHTML=copy[2];
-
-    // dc load text (constant, but flips to "+freed sellable" during discharge)
+    // dc load text
     $('dcLoad').textContent = st.freed>1.2 ? 'IT 20.0 + '+fmt(st.freed)+' MW unlockable' : 'IT load 20.0 MW';
   }
 
-  // ---------- playback ----------
   var progress=0, playing=false, speed=2, raf=null, last=0;
   function setSpeed(s){speed=s;['s1','s2','s4'].forEach(function(id){$(id).classList.remove('on')});$('s'+s).classList.add('on')}
   $('s1').onclick=function(){setSpeed(1)};$('s2').onclick=function(){setSpeed(2)};$('s4').onclick=function(){setSpeed(4)};
@@ -541,7 +523,7 @@ document.addEventListener('DOMContentLoaded',function(){
     if(!playing)return;
     var dt=(now-last)/1000; last=now;
     progress+=dt*speed*0.022;
-    if(progress>=1){progress=progress-1;} // loop seamlessly
+    if(progress>=1){progress=progress-1;}
     render();
     raf=requestAnimationFrame(tick);
   }
@@ -549,7 +531,6 @@ document.addEventListener('DOMContentLoaded',function(){
   function pause(){playing=false;$('play').textContent='▶';cancelAnimationFrame(raf)}
   $('play').onclick=function(){playing?pause():play()};
 
-  // scrub
   var tl=$('tlbg'),drag=false;
   function scrub(clientX){var r=tl.getBoundingClientRect();progress=clamp((clientX-r.left)/r.width,0,0.9999);render()}
   tl.addEventListener('mousedown',function(e){drag=true;scrub(e.clientX)});
@@ -560,7 +541,6 @@ document.addEventListener('DOMContentLoaded',function(){
   document.addEventListener('touchend',function(){drag=false});
 
   window.addEventListener('resize',render);
-  // start mid-charge so it looks alive, then autoplay
   progress=0.0; render();
   setTimeout(play,600);
 });
