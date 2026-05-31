@@ -579,19 +579,19 @@ function drawAll(h,st,fW,fG,fC){
   var aC=st.charging?0.9:0.08;
 
   // Water supply pipe (blue, left loop down-left side)
-  pipe([[182,100],[205,100],[205,310],[182,310]],C.sup,4,fW,aG);
+  pipe([[182,100],[205,100],[205,310],[182,310]],C.sup,4,fW,aW);
   // arrow on supply
-  arrow(205,200,Math.PI/2,C.sup,5,aG);
+  arrow(205,200,Math.PI/2,C.sup,5,aW);
 
   // Water return (red, left loop up-left side)
-  pipe([[182,378],[260,378],[320,378],[320,313]],C.ret,4,fW*0.9,aG);
-  pipe([[320,247],[320,65],[182,65]],C.pre,4,fW*0.9,aG);
-  arrow(260,378,0,C.ret,5,aG);
-  arrow(320,155,3*Math.PI/2,C.pre,5,aG);
+  pipe([[182,378],[260,378],[320,378],[320,313]],C.ret,4,fW*0.9,aW);
+  pipe([[320,247],[320,65],[182,65]],C.pre,4,fW*0.9,aW);
+  arrow(260,378,0,C.ret,5,aW);
+  arrow(320,155,3*Math.PI/2,C.pre,5,aW);
 
   // HX precool water out to chiller array (cold)
-  pipe([[320,247],[320,200],[240,200],[182,200]],C.cold,4,fW,aG*0.8);
-  arrow(280,200,Math.PI,C.cold,5,aG*0.8);
+  pipe([[320,247],[320,200],[240,200],[182,200]],C.cold,4,fW,aW*0.8);
+  arrow(280,200,Math.PI,C.cold,5,aW*0.8);
 
   // Glycol discharge: IceBricks cold port → V1 → V2 → HX
   var v1PortX=715+20, v1PortY=290;
