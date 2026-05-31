@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Architecture — Nostromo Energy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/main.css">
+<style>
+.shell{max-width:1320px;margin:0 auto;padding:20px clamp(14px,3vw,34px) 36px}
+.ahead h1{font-size:clamp(24px,3.4vw,34px);font-weight:800;letter-spacing:-.5px}
+.ahead p{color:var(--grayL);font-size:15px;max-width:74ch;margin-top:10px;line-height:1.6}
+.ahead p b{color:var(--white);font-weight:600}
+.ahead .t{color:var(--teal)}.ahead .r{color:#f87171}
+
+.toolbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:18px 0 12px}
+.lkey{display:flex;gap:16px;flex-wrap:wrap}
+.lkey span{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--grayL)}
+.lkey i{width:22px;height:0;border-top-width:3px;border-top-style:solid;display:inline-block;border-radius:2px}
+.lkey i.solid{border-top-color:var(--teal)}
+.lkey i.dashR{border-top-color:#ef4444;border-top-style:dashed}
+.lkey i.dashA{border-top-color:var(--gold);border-top-style:dashed}
+.lkey i.purp{border-top-color:#a78bfa;border-top-style:dotted}
+.toolbar .spacer{flex:1}
+.tgl{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--grayL);cursor:pointer;
+  border:1px solid var(--line2);border-radius:9px;padding:7px 12px;background:transparent;transition:.2s;font-family:var(--m)}
+.tgl.on{color:var(--teal);border-color:var(--teal);background:rgba(20,184,166,.1)}
+
+.diagram-wrap{background:linear-gradient(180deg,var(--card),var(--bg2));border:1px solid var(--line);border-radius:16px;
+  padding:10px;overflow:hidden}
+#diagram{display:block;width:100%;height:auto}
+
+/* node styling */
+.node-rect{transition:.2s;cursor:pointer}
+.node:hover .node-rect, .node.sel .node-rect{filter:drop-shadow(0 0 10px currentColor)}
+.node-title{font-family:var(--f);font-weight:800;fill:#f1f5f9;pointer-events:none}
+.node-sub{font-family:var(--m);fill:#8294ac;pointer-events:none}
+.band-label{font-family:var(--m);font-weight:700;letter-spacing:2px;fill:#3f4d66;text-transform:uppercase}
+.edge{fill:none;stroke-linecap:round}
+.edge-label{font-family:var(--m);fill:#7e8ca3;pointer-events:none}
+.pulse{opacity:0}
+.pulsing .pulse{opacity:1}
+
+/* detail panel */
+.detail{margin-top:14px;background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:18px 20px;min-height:96px;display:flex;gap:18px;align-items:flex-start;transition:border-color .3s}
+.detail .dbadge{font-family:var(--m);font-size:10px;letter-spacing:1.4px;text-transform:uppercase;font-weight:700;
+  padding:5px 11px;border-radius:8px;white-space:nowrap;flex-shrink:0;margin-top:2px}
+.detail .dbody h3{font-size:18px;font-weight:800;margin-bottom:4px}
+.detail .dbody .cad{font-family:var(--m);font-size:11px;color:var(--gray);margin-bottom:8px}
+.detail .dbody p{font-size:14px;color:var(--grayL);line-height:1.6}
+.detail .dbody p b{color:var(--white);font-weight:600}
+
+/* two-loop explainer */
+.loops{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:24px}
+@media(max-width:780px){.loops{grid-template-columns:1fr}}
+.loop{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px;position:relative;overflow:hidden}
+.loop::before{content:"";position:absolute;left:0;top:0;width:100%;height:3px}
+.loop.plan::before{background:linear-gradient(90deg,var(--teal),var(--blue))}
+.loop.rt::before{background:linear-gradient(90deg,#ef4444,var(--orange))}
+.loop .lh{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.loop .lh .cad{font-family:var(--m);font-size:10px;letter-spacing:1.2px;color:var(--gray);text-transform:uppercase}
+.loop h3{font-size:17px;font-weight:800}
+.loop p{font-size:13.5px;color:var(--grayL);line-height:1.65;margin-top:8px}
+.loop p b{color:var(--white);font-weight:600}
+.loop .chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:13px}
+.loop .chips span{font-family:var(--m);font-size:11px;padding:4px 9px;border-radius:20px;border:1px solid var(--line2);color:var(--grayL)}
+
+.safebox{margin-top:16px;background:rgba(20,184,166,.05);border:1px solid rgba(20,184,166,.22);border-radius:14px;padding:18px 22px}
+.safebox h3{font-size:15px;font-weight:800;color:var(--teal);margin-bottom:10px;letter-spacing:.2px}
+.safebox ul{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:10px 24px}
+@media(max-width:780px){.safebox ul{grid-template-columns:1fr}}
+.safebox li{font-size:13.5px;color:var(--grayL);line-height:1.55;padding-left:20px;position:relative}
+.safebox li::before{content:"▸";position:absolute;left:0;color:var(--teal)}
+.safebox li b{color:var(--white);font-weight:600}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="brand" href="index.html"><span class="mark"></span><span>NOSTROMO<small>Energy · Thermal Storage</small></span></a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="operations.html">Operations</a>
+    <a href="architecture.html" class="active">Architecture</a>
+  </div>
+</nav>
+
+<div class="shell">
+  <div class="ahead">
+    <h1>Cloud &amp; Control Architecture</h1>
+    <p>Two loops working together. A <span class="t">planned layer</span> turns forecasts into an hourly
+       dispatch plan, written to the <b>Power Control Table</b>. A <span class="r">real-time layer</span> watches the
+       live meter every minute and bends that plan — discharging more or less, or starting/stopping a charge —
+       before the hardware executes the current row. <b>Hover any block</b> to see what it does.</p>
+  </div>
+
+  <div class="toolbar">
+    <div class="lkey">
+      <span><i class="solid"></i>planned · hourly</span>
+      <span><i class="dashR"></i>real-time · minutely</span>
+      <span><i class="dashA"></i>planned target</span>
+      <span><i class="purp"></i>integration</span>
+    </div>
+    <div class="spacer"></div>
+    <button class="tgl on" id="pulseTgl">◉ flow pulses: on</button>
+  </div>
+
+  <div class="diagram-wrap">
+    <svg id="diagram" viewBox="0 0 1280 800" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrTeal" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0 0 L7 3 L0 6 Z" fill="#14B8A6"/></marker>
+        <marker id="arrRed" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0 0 L7 3 L0 6 Z" fill="#ef4444"/></marker>
+        <marker id="arrGold" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0 0 L7 3 L0 6 Z" fill="#FBBF24"/></marker>
+        <marker id="arrPurp" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0 0 L7 3 L0 6 Z" fill="#a78bfa"/></marker>
+        <marker id="arrBlue" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0 0 L7 3 L0 6 Z" fill="#3B82F6"/></marker>
+      </defs>
+      <g id="bands"></g>
+      <g id="edges"></g>
+      <g id="pulses"></g>
+      <g id="nodes"></g>
+    </svg>
+  </div>
+
+  <div class="detail" id="detail">
+    <div class="dbadge" id="dBadge" style="background:rgba(255,255,255,.06);color:var(--grayL)">SELECT</div>
+    <div class="dbody">
+      <h3 id="dTitle">Explore the pipeline</h3>
+      <div class="cad" id="dCad">hover or tap a block</div>
+      <p id="dDesc">Each block is a stage in Nostromo's dispatch engine. The planned loop runs once per hour; the real-time loop runs every minute and can override the plan within safe limits.</p>
+    </div>
+  </div>
+
+  <!-- TWO LOOPS -->
+  <div class="loops">
+    <div class="loop plan">
+      <div class="lh"><span class="cad">Hourly · day-ahead</span></div>
+      <h3>① The planned loop</h3>
+      <p>Cooling &amp; power forecasts, the site's physical limits and the <b>meter cap (+ buffer)</b> feed the
+         <b>Composer</b>, which builds an hourly discharge plan — a target for what the meter should read each hour.
+         <b>Pre-PCT</b> translates that into service rules (water-side stability, charge/discharge windows, durations);
+         <b>PCT Calculation</b> turns the rules into concrete numbers and writes the <b>Power Control Table</b>.</p>
+      <div class="chips"><span>forecast in</span><span>→ Composer</span><span>→ rules</span><span>→ hourly table</span></div>
+    </div>
+    <div class="loop rt">
+      <div class="lh"><span class="cad">Minutely · live</span></div>
+      <h3>② The real-time loop</h3>
+      <p>The <b>IRM</b> (Nostromo's own meter at the main-meter point) and <b>chiller kW</b> stream in every minute.
+         <b>Real-time Adjustments</b> compares the live meter to the planned target plus a buffer and decides to
+         <b>discharge more/less</b>, <b>charge</b>, or <b>stop charging</b>. <b>Post-PCT</b> writes the corrected rows
+         and <b>HCS</b> executes the current row on the plant immediately.</p>
+      <div class="chips"><span>live meter</span><span>vs target</span><span>→ adjust</span><span>→ execute now</span></div>
+    </div>
+  </div>
+
+  <div class="safebox">
+    <h3>What keeps the real-time loop safe</h3>
+    <ul>
+      <li><b>Meter vs target + buffer.</b> The core trigger — act only once the live meter drifts past the planned target by more than the deadband.</li>
+      <li><b>SOC pacing.</b> Meter discharge against <b>remaining stored cooling vs remaining peak hours</b> so the store never runs dry before the peak ends.</li>
+      <li><b>Supply-temp guard.</b> The 60&deg;F supply to the data center is a hard constraint — temperature always wins over a kW target.</li>
+      <li><b>Hysteresis.</b> A deadband on charge↔discharge so the system never oscillates minute-to-minute.</li>
+    </ul>
+  </div>
+
+</div>
+
+<div class="footer"><b>Nostromo Energy</b> — control architecture · hover blocks to inspect</div>
+
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+  var NS='http://www.w3.org/2000/svg';
+  var C={teal:'#14B8A6',blue:'#3B82F6',red:'#ef4444',gold:'#FBBF24',purp:'#a78bfa',gray:'#64748b',cyan:'#06B6D4'};
+
+  // ---------- NODES ----------
+  var N={
+    // planned inputs
+    cooling:{x:40,y:92,w:182,h:52,t:'Cooling Forecast',s:'hourly',c:C.cyan,band:'in',
+      cad:'INPUT · hourly',d:'Predicted cooling demand for each hour of the coming day, derived from weather and the site\'s thermal behaviour.'},
+    power:{x:40,y:156,w:182,h:52,t:'Power Forecast',s:'hourly',c:C.cyan,band:'in',
+      cad:'INPUT · hourly',d:'Predicted IT / facility power per hour — the load the cooling system has to keep up with.'},
+    sysparams:{x:40,y:220,w:182,h:52,t:'System Parameters',s:'size · window · min/max',c:C.gray,band:'in',
+      cad:'INPUT · static',d:'Physical limits of the install: store size, the daily charge/discharge window, battery/charge rates, and min/max bounds.'},
+    meterlimit:{x:40,y:284,w:182,h:52,t:'Main Meter Limit',s:'cap + buffer',c:C.red,band:'in',
+      cad:'INPUT · constraint',d:'The site\'s grid interconnection cap plus a safety buffer. The whole plan is shaped to keep the meter under this line.'},
+    // planned pipeline
+    composer:{x:300,y:150,w:172,h:96,t:'Composer',s:'builds hourly plan',c:C.teal,band:'plan',
+      cad:'PLANNED · engine',d:'The dispatch engine. Combines forecasts, limits and parameters into an hourly discharge plan — a target meter reading for every hour.'},
+    prepct:{x:520,y:150,w:172,h:96,t:'Pre-PCT',s:'rules · service logic',c:C.teal,band:'plan',
+      cad:'PLANNED · translate',d:'Turns Composer\'s targets into service rules: water-side stability, charge/discharge windows, time-of-use hours and durations (manual override available).'},
+    pctcalc:{x:740,y:150,w:172,h:96,t:'PCT Calculation',s:'rules → numbers',c:C.teal,band:'plan',
+      cad:'PLANNED · compile',d:'Converts the rules into concrete numeric setpoints using the existing control logic, and saves them where the real-time loop can fetch them.'},
+    pcttable:{x:968,y:150,w:188,h:250,t:'Power Control Table',s:'hourly rows · the shared artifact',c:C.blue,band:'pct',
+      cad:'SHARED ARTIFACT',d:'The single source of truth: one row per hour. The planned loop writes it, the real-time loop updates it, and HCS executes whichever row is current.'},
+    // realtime inputs
+    irm:{x:40,y:474,w:182,h:52,t:'IRM',s:'Nostromo meter · minutely',c:C.red,band:'rtin',
+      cad:'REAL-TIME · minutely',d:'Independent Real-time Meter — Nostromo\'s own meter at the main-meter point, read every minute. The live ground-truth for control.'},
+    chillkw:{x:40,y:538,w:182,h:52,t:'Chiller kW',s:'via BMS · minutely',c:C.red,band:'rtin',
+      cad:'REAL-TIME · minutely',d:'Live chiller power draw, taken from Nostromo sensors or a BMS integration. Separates cooling load from IT load behind the meter.'},
+    adjparams:{x:40,y:602,w:182,h:52,t:'Adjustment Params',s:'buffer · step · min/max',c:C.gray,band:'rtin',
+      cad:'REAL-TIME · config',d:'Tuning for the live loop: the buffer/deadband, correction step size, and the min/max bounds the adjustments must respect.'},
+    // realtime pipeline
+    rtadj:{x:300,y:486,w:188,h:120,t:'Real-time Adjustments',s:'compare · decide · trigger',c:C.red,band:'rt',
+      cad:'REAL-TIME · decision',d:'Compares the live meter to the planned target + buffer and triggers discharge more/less, charge, or stop-charge — paced by remaining SOC and bounded by the supply-temp guard.'},
+    postpct:{x:540,y:506,w:150,h:80,t:'Post-PCT',s:'service logic',c:C.orange||'#F97316',band:'rt',
+      cad:'REAL-TIME · apply',d:'Applies the adjustment as corrected rows, re-running the service logic so the updated table is still safe and consistent.'},
+    hcs:{x:745,y:500,w:172,h:96,t:'HCS',s:'executes current row',c:C.gold,band:'rt',
+      cad:'REAL-TIME · execute',d:'Hardware Control System. Reads the current row of the (possibly just-updated) table and acts on the plant immediately — no waiting for the next hour.'},
+    // integrations
+    bms:{x:540,y:686,w:212,h:64,t:'BMS',s:'plant telemetry + setpoints',c:C.purp,band:'int',
+      cad:'INTEGRATION',d:'Building Management System. Source of chiller kW and plant telemetry, and the channel HCS uses to push setpoints to chillers, pumps and valves.'},
+    dcim:{x:968,y:474,w:188,h:80,t:'DCIM',s:'meter + unlocked capacity',c:C.purp,band:'int',
+      cad:'INTEGRATION',d:'Data Center Infrastructure Management. Shares the main-meter / power picture and surfaces the freed megawatts back to the operator as sellable IT capacity.'},
+    plant:{x:800,y:686,w:140,h:64,t:'Plant',s:'chillers · pumps',c:C.gray,band:'int',
+      cad:'HARDWARE',d:'The physical cooling plant. Receives setpoints via the BMS and is what ultimately charges or discharges the IceBricks store.'}
+  };
+
+  // ---------- BANDS (background regions) ----------
+  var BANDS=[
+    {x:24,y:64,w:910,h:200,label:'Planned layer · day-ahead',col:'rgba(20,184,166,.025)',line:'rgba(20,184,166,.14)'},
+    {x:24,y:452,w:910,h:182,label:'Real-time layer · minutely',col:'rgba(239,68,68,.03)',line:'rgba(239,68,68,.16)'},
+    {x:24,y:660,w:932,h:104,label:'Integrations & hardware',col:'rgba(167,139,250,.03)',line:'rgba(167,139,250,.16)'}
+  ];
+
+  // ---------- EDGES ----------
+  // type: solid|dashR|dashA|purp ; anchor helpers below
+  var E=[
+    // inputs -> composer
+    ['cooling','composer','solid'],['power','composer','solid'],['sysparams','composer','solid'],['meterlimit','composer','solid'],
+    // planned spine
+    ['composer','prepct','solid'],['prepct','pctcalc','solid'],['pctcalc','pcttable','solid'],
+    // planned target down to RT
+    ['composer','rtadj','dashA','planned target kW'],
+    // PCT -> HCS (current row)
+    ['pcttable','hcs','solid','PCT table'],
+    // realtime inputs -> rtadj
+    ['irm','rtadj','dashR'],['chillkw','rtadj','dashR'],['adjparams','rtadj','dashR'],
+    // realtime spine
+    ['rtadj','postpct','dashR'],['postpct','hcs','dashR'],
+    // post-pct writes back to table
+    ['postpct','pcttable','dashR','updates rows'],
+    // integrations
+    ['hcs','bms','purp','setpoints'],
+    ['bms','plant','purp'],
+    ['bms','chillkw','purp','chiller kW'],
+    ['dcim','pcttable','purp','meter / freed MW']
+  ];
+
+  var nodesG=document.getElementById('nodes'),
+      edgesG=document.getElementById('edges'),
+      bandsG=document.getElementById('bands'),
+      pulsesG=document.getElementById('pulses');
+
+  function mk(tag,attrs){var e=document.createElementNS(NS,tag);for(var k in attrs)e.setAttribute(k,attrs[k]);return e;}
+
+  // bands
+  BANDS.forEach(function(b){
+    bandsG.appendChild(mk('rect',{x:b.x,y:b.y,width:b.w,height:b.h,rx:16,fill:b.col,stroke:b.line,'stroke-width':1}));
+    var t=mk('text',{x:b.x+16,y:b.y+22,class:'band-label','font-size':11});t.textContent=b.label;bandsG.appendChild(t);
+  });
+
+  // anchor points
+  function cx(n){return n.x+n.w/2} function cy(n){return n.y+n.h/2}
+  function anchor(a,b){ // pick edge point on A facing B
+    var ax=cx(a),ay=cy(a),bx=cx(b),by=cy(b);
+    var dx=bx-ax,dy=by-ay;
+    if(Math.abs(dx)>Math.abs(dy)){ // horizontal dominant
+      return dx>0 ? {x:a.x+a.w,y:ay,side:'r'} : {x:a.x,y:ay,side:'l'};
+    } else {
+      return dy>0 ? {x:ax,y:a.y+a.h,side:'b'} : {x:ax,y:a.y,side:'t'};
+    }
+  }
+  function pathFor(from,to){
+    var A=N[from],B=N[to];
+    var p1=anchor(A,B),p2=anchor(B,A);
+    // orthogonal elbow
+    var d;
+    if(p1.side==='r'||p1.side==='l'){
+      var mxp=(p1.x+p2.x)/2;
+      d='M'+p1.x+' '+p1.y+' H'+mxp+' V'+p2.y+' H'+p2.x;
+    } else {
+      var myp=(p1.y+p2.y)/2;
+      d='M'+p1.x+' '+p1.y+' V'+myp+' H'+p2.x+' V'+p2.y;
+    }
+    return d;
+  }
+
+  var stylemap={
+    solid:{stroke:C.teal,dash:'',mk:'arrTeal'},
+    dashR:{stroke:C.red,dash:'7 6',mk:'arrRed'},
+    dashA:{stroke:C.gold,dash:'7 6',mk:'arrGold'},
+    purp:{stroke:C.purp,dash:'2 7',mk:'arrPurp'}
+  };
+
+  // draw edges + pulses
+  E.forEach(function(e,i){
+    var from=e[0],to=e[1],type=e[2],label=e[3];
+    var st=stylemap[type];
+    var d=pathFor(from,to);
+    var id='edge'+i;
+    var p=mk('path',{id:id,d:d,class:'edge',stroke:st.stroke,'stroke-width':type==='solid'?2.4:2,
+      'stroke-dasharray':st.dash,'marker-end':'url(#'+st.mk+')',opacity:type==='purp'?0.8:0.92});
+    edgesG.appendChild(p);
+    if(label){
+      // label near midpoint
+      var A=N[from],B=N[to];
+      var lx=(cx(A)+cx(B))/2, ly=(cy(A)+cy(B))/2-6;
+      var bg=mk('rect',{x:lx-label.length*3.4-5,y:ly-12,width:label.length*6.8+10,height:16,rx:4,
+        fill:'#0c1322',opacity:.92});
+      edgesG.appendChild(bg);
+      var t=mk('text',{x:lx,y:ly,class:'edge-label','font-size':10.5,'text-anchor':'middle'});
+      t.textContent=label;edgesG.appendChild(t);
+    }
+    // pulse dot travelling along path
+    if(type!=='purp'){
+      var pc=mk('circle',{r:4,fill:st.stroke,class:'pulse'});
+      var am=mk('animateMotion',{dur:(2.6+ (i%3)*0.5)+'s',repeatCount:'indefinite',rotate:'auto',begin:'0s'});
+      am.setAttribute('path',d);
+      pc.appendChild(am);
+      pulsesG.appendChild(pc);
+    }
+  });
+
+  // draw nodes
+  function addNode(key){
+    var n=N[key];
+    var g=mk('g',{class:'node','data-key':key});
+    var r=mk('rect',{x:n.x,y:n.y,width:n.w,height:n.h,rx:12,class:'node-rect',
+      fill:'#10192b',stroke:n.c,'stroke-width':1.6});
+    r.style.color=n.c;
+    g.appendChild(r);
+    // accent bar
+    g.appendChild(mk('rect',{x:n.x,y:n.y,width:4,height:n.h,rx:2,fill:n.c,opacity:.9}));
+    var ty=n.h>110? n.y+34 : (n.y+ n.h/2 - (n.s?7:0));
+    var t=mk('text',{x:n.x+16,y:ty,class:'node-title','font-size':n.w>180?15:14});
+    t.textContent=n.t; g.appendChild(t);
+    if(n.s){
+      var s=mk('text',{x:n.x+16,y:ty+17,class:'node-sub','font-size':10.5});
+      s.textContent=n.s; g.appendChild(s);
+    }
+    nodesG.appendChild(g);
+    g.addEventListener('mouseenter',function(){select(key)});
+    g.addEventListener('click',function(){select(key,true)});
+  }
+  Object.keys(N).forEach(addNode);
+
+  // ---------- detail panel ----------
+  var det=document.getElementById('detail'),pinned=null;
+  function select(key,pin){
+    if(pin){pinned=key} 
+    var k=pin?key:(pinned||key);
+    var n=N[k];
+    document.querySelectorAll('.node').forEach(function(g){g.classList.toggle('sel',g.getAttribute('data-key')===k)});
+    document.getElementById('dTitle').textContent=n.t;
+    document.getElementById('dCad').textContent=n.cad;
+    document.getElementById('dDesc').textContent=n.d;
+    var b=document.getElementById('dBadge');
+    b.textContent=n.band==='in'?'INPUT':n.band==='plan'?'PLANNED':n.band==='pct'?'TABLE':n.band==='rtin'?'LIVE IN':n.band==='rt'?'REAL-TIME':'INTEGRATION';
+    b.style.background=hexA(n.c,.14); b.style.color=n.c;
+    det.style.borderColor=hexA(n.c,.4);
+  }
+  function hexA(hex,a){var h=hex.replace('#','');var r=parseInt(h.substr(0,2),16),g=parseInt(h.substr(2,2),16),bl=parseInt(h.substr(4,2),16);return'rgba('+r+','+g+','+bl+','+a+')';}
+
+  // ---------- pulse toggle ----------
+  var svg=document.getElementById('diagram'), pulsing=true;
+  svg.classList.add('pulsing');
+  document.getElementById('pulseTgl').addEventListener('click',function(){
+    pulsing=!pulsing; svg.classList.toggle('pulsing',pulsing);
+    this.classList.toggle('on',pulsing);
+    this.textContent= pulsing?'◉ flow pulses: on':'○ flow pulses: off';
+  });
+});
+</script>
+</body>
+</html>
