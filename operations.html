@@ -19,16 +19,16 @@ body{display:flex;flex-direction:column}
 .scrubwrap .ph{font-size:8px;color:#2a3d5c;font-family:'Courier New',monospace}
 input[type=range]{width:100%;-webkit-appearance:none;height:3px;border-radius:2px;background:#14213a;outline:none;cursor:pointer}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:10px;height:10px;border-radius:50%;background:#a78bfa;border:2px solid #080c14}
-#clock{font-size:14px;font-weight:700;color:#38bdf8;font-family:'Courier New',monospace}
-#badge{padding:2px 10px;border-radius:10px;font-size:8.5px;font-weight:700;letter-spacing:.08em;background:#0d1117;border:1px solid #14213a;color:#14213a;transition:all .3s;white-space:nowrap}
-.tbtn{padding:3px 9px;background:#0b1424;border:1px solid #1e3050;border-radius:4px;color:#5b7bb8;font-size:9px;font-weight:700;cursor:pointer}
+#clock{font-size:14px;font-weight:700;color:#38bdf8;font-family:'JetBrains Mono','Courier New',monospace}
+#badge{padding:3px 12px;border-radius:12px;font-size:9px;font-weight:700;letter-spacing:.06em;background:#0d1117;border:1px solid #14213a;color:#14213a;transition:all .3s;white-space:nowrap;font-family:'Outfit',sans-serif}
+.tbtn{padding:4px 10px;background:#0b1424;border:1px solid #1e3050;border-radius:6px;color:#5b7bb8;font-size:9px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif}
 .tbtn:hover{background:#13203a}
-#playbtn{padding:3px 13px;background:#0b1e38;border:1px solid #1d4ed8;border-radius:4px;color:#60a5fa;font-size:9.5px;font-weight:700;cursor:pointer}
+#playbtn{padding:4px 14px;background:#0b1e38;border:1px solid #1d4ed8;border-radius:6px;color:#60a5fa;font-size:10px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif}
 #playbtn:hover{background:#152d52}
 #scenebar{height:32px;background:#080c14;border-top:1px solid #14213a;
   display:flex;align-items:center;gap:8px;padding:0 14px;flex-shrink:0}
-.scl{font-size:8px;color:#2a3d5c;font-family:'Courier New',monospace;white-space:nowrap}
-.scv{font-size:9px;font-weight:700;color:#38bdf8;font-family:'Courier New',monospace;white-space:nowrap;min-width:52px}
+.scl{font-size:9px;color:#2a3d5c;font-family:'Outfit',sans-serif;white-space:nowrap;font-weight:600}
+.scv{font-size:10px;font-weight:700;color:#38bdf8;font-family:'JetBrains Mono','Courier New',monospace;white-space:nowrap;min-width:52px}
 #scenebar input{width:100px;margin:0}
 </style>
 </head>
@@ -166,7 +166,16 @@ function rr(x,y,w,h,r,fill,stroke,lw){
 function t(s,x,y,col,sz,w,a){
   cx.save();
   cx.fillStyle=col||'#fff';
-  cx.font=(w||'400')+' '+D(sz||9)+'px "Courier New",monospace';
+  cx.font=(w||'400')+' '+D(sz||9)+'px "Outfit","Segoe UI",system-ui,sans-serif';
+  cx.textAlign=a||'center';
+  cx.textBaseline='middle';
+  cx.fillText(s,X(x),Y(y));
+  cx.restore();
+}
+function tm(s,x,y,col,sz,w,a){
+  cx.save();
+  cx.fillStyle=col||'#fff';
+  cx.font=(w||'400')+' '+D(sz||9)+'px "JetBrains Mono","Courier New",monospace';
   cx.textAlign=a||'center';
   cx.textBaseline='middle';
   cx.fillText(s,X(x),Y(y));
@@ -516,8 +525,8 @@ function drawMeterArc(x,y,r,val,mn,mx,tgt,cap,label){
   cx.lineTo(X(tick_x+3),Y(tick_y+3));
   cx.stroke();
   cx.restore();
-  t(val.toFixed(1),x,y,col,22,'700');
-  t('MW',x+16,y+3,col,8,'700','left');
+  tm(val.toFixed(1),x,y,col,22,'700');
+  tm('MW',x+16,y+3,col,8,'700','left');
   t(label,x,y+20,'#2a3d5c',7,'600');
 }
 
@@ -528,30 +537,46 @@ function drawAll(h,st,fW,fG,fC){
   cx.fillRect(0,0,cv.width,cv.height);
 
   // ── COMPONENT POSITIONS ──────────────────────────────────────
-  // Left column
   var chillerX=12, chillerY=28, chillerW=170, chillerH=92;
   var meterX2=12, meterY2=140, meterW=170, meterH=128;
   var dcX=12, dcY=290, dcW=170, dcH=110;
-
-  // Center
   var hxX=320, hxY=235, hxW=120, hxH=90;
   var v1X=700, v1Y=290;
   var v2X=486, v2Y=242;
-
-  // Right column
-  var optX=525, optY=28, optW=370, optH=98;
   var nchX=525, nchY=140, nchW=170, nchH=90;
   var icesX=715, icesY=148, icesW=180, icesH=310;
 
-  // ── TES BOUNDING BOX ─────────────────────────────────────────
-  rr(708,138,196,330,6,'rgba(3,7,18,0.7)','rgba(52,211,153,0.25)',1.2);
-  t('NOSTROMO TES SYSTEM',806,130,'rgba(52,211,153,0.55)',7.5,'700');
+  // ── ZONE BACKGROUNDS ─────────────────────────────────────────
+  // Data Centre zone (left)
+  rr(8,20,500,468,10,'rgba(30,58,138,0.04)','rgba(59,130,246,0.22)',1.2);
+  t('◆  DATA CENTRE',254,31,'rgba(96,165,250,0.65)',9,'700');
+  // Nostromo IceBrick zone (right)
+  rr(516,20,398,468,10,'rgba(5,150,105,0.04)','rgba(52,211,153,0.2)',1.2);
+  t('◆  NOSTROMO ICEBRICK SYSTEM',715,31,'rgba(52,211,153,0.65)',9,'700');
+
+  // ── ELECTRICAL SUPPLY LINES FROM MAIN METER ─────────────────
+  cx.save();
+  cx.lineCap='round';
+  // Always-on: Meter top → Chiller Array, Meter bottom → DC
+  cx.strokeStyle='#fbbf24'; cx.lineWidth=D(1.8); cx.globalAlpha=0.5;
+  cx.setLineDash([D(5),D(3)]);
+  cx.beginPath(); cx.moveTo(X(97),Y(140)); cx.lineTo(X(97),Y(120)); cx.stroke();
+  cx.beginPath(); cx.moveTo(X(97),Y(268)); cx.lineTo(X(97),Y(290)); cx.stroke();
+  t('⚡',97,131,'#fbbf24',9,'700');
+  t('⚡',97,280,'#fbbf24',9,'700');
+  // Charging only: Meter right → Nostromo Chiller
+  cx.strokeStyle=C.chg; cx.lineWidth=D(2.5);
+  cx.globalAlpha=st.charging?0.85:0.1;
+  cx.setLineDash([D(6),D(4)]);
+  cx.lineDashOffset=-(fC*0.4);
+  cx.beginPath(); cx.moveTo(X(182),Y(175)); cx.lineTo(X(525),Y(175)); cx.stroke();
+  cx.restore();
+  if(st.charging) t('⚡',353,168,C.chg,11,'700');
 
   // ── PIPE ROUTING ─────────────────────────────────────────────
-  var aW=st.charging?0.9:0.08;    // water supply / return alpha when charging
-  var aD=st.discharging?0.9:0.08; // glycol discharge alpha
-  var aG=0.85;                    // always-on building water
-  var aC=st.charging?0.9:0.08;    // charge loop
+  var aW=0.85;
+  var aD=st.discharging?0.9:0.08;
+  var aC=st.charging?0.9:0.08;
 
   // Water supply pipe (blue, left loop down-left side)
   pipe([[182,100],[205,100],[205,310],[182,310]],C.sup,4,fW,aG);
@@ -588,22 +613,7 @@ function drawAll(h,st,fW,fG,fC){
   // IceBricks warm return → N.Chiller
   pipe([[715,230],[695,230],[695,195]],C.warm,4,fC*0.85,aC*0.7);
 
-  // Optimizer signal dashes (cmd color, thin)
-  cx.save();
-  cx.strokeStyle=C.cmd;
-  cx.lineWidth=D(1);
-  cx.setLineDash([D(3),D(4)]);
-  cx.lineDashOffset=-(fC*0.5);
-  cx.globalAlpha=0.4;
-  cx.beginPath();
-  cx.moveTo(X(optX+optW/2),Y(optY+optH));
-  cx.lineTo(X(optX+optW/2),Y(nchY));
-  cx.stroke();
-  cx.beginPath();
-  cx.moveTo(X(optX+optW/2),Y(optY+optH));
-  cx.lineTo(X(v1X),Y(v1Y-24));
-  cx.stroke();
-  cx.restore();
+  // (optimizer signal dashes removed)
 
   // ── ISA INSTRUMENTS ──────────────────────────────────────────
   isa(182,52,'FT','101',C.sup,8);
@@ -703,50 +713,58 @@ function drawAll(h,st,fW,fG,fC){
   }
   t('60°F SUPPLY  /  70°F RETURN',dcX+dcW/2,dcY+dcH-8,'#475569',7,'600');
 
-  // ── OPTIMIZER BOX (top right) ─────────────────────────────────
-  rr(optX,optY,optW,optH,6,'#070a14',C.cmd,1.4);
-  // glow
-  glow(optX+optW/2,optY+optH/2,optW*0.6,C.cmd,0.07);
-  t('OPTIMIZER',optX+optW/2,optY+12,C.cmd,11,'700');
-  t('NOSTROMO DISPATCH ENGINE',optX+optW/2,optY+24,'#4c1d95',7.5,'600');
-  // status tags
-  var dispLine='PHASE: '+st.phase.toUpperCase()+'   SOC: '+Math.round(st.soc*100)+'%   METER: '+st.meter.toFixed(1)+' MW';
-  t(dispLine,optX+optW/2,optY+40,C.cmd,7.5,'700');
-  t('IT: '+itLoad.toFixed(1)+' MW   COOL: '+st.chEff.toFixed(1)+' MW   CAP: '+CAP+' MW   FREED: '+st.freed.toFixed(1)+' MW',
-    optX+optW/2,optY+55,'#5b21b6',7,'600');
-  t('CHARGE WINDOW: 22:00–08:00   DISCHARGE: 12:00–20:00',optX+optW/2,optY+70,'#3b1764',7,'600');
-  // outer border glow
+  // ── DC KPI PANEL (top right, where optimizer was) ────────────
+  rr(525,28,370,98,8,'#060a14',C.sup,1.2);
+  t('DATA CENTRE · LIVE STATUS',710,42,C.sup,10.5,'700');
+  // 5 KPI tiles
+  var kpis=[
+    {label:'IT LOAD',    val:itLoad.toFixed(1)+' MW',             col:C.sup},
+    {label:'CHILLER',    val:st.chEff.toFixed(1)+' MW',           col:C.ret},
+    {label:'PUE',        val:(1+st.chEff/itLoad).toFixed(2),      col:'#a78bfa'},
+    {label:'FREED',      val:st.freed.toFixed(1)+' MW',           col:C.cold},
+    {label:'TES RELIEF', val:st.off.toFixed(1)+' MW',             col:st.discharging?C.warm:'#1e3050'}
+  ];
+  kpis.forEach(function(kpi,i){
+    var kx=541+i*72, ky=73;
+    rr(kx,ky-11,64,34,4,'#0a0e18',kpi.col,0.7);
+    t(kpi.label,kx+32,ky-4,'#2a3d5c',6.5,'700');
+    tm(kpi.val,kx+32,ky+11,kpi.col,9.5,'700');
+  });
+  // Meter breakdown bar
+  var bBar=535, yBar=108, wBar=350, hBar=7;
   cx.save();
-  cx.strokeStyle=C.cmd;
-  cx.lineWidth=D(0.5);
-  cx.globalAlpha=0.3+0.2*Math.sin(Date.now()/1200);
-  cx.setLineDash([D(4),D(6)]);
-  rr(optX-2,optY-2,optW+4,optH+4,7,null,C.cmd,0.5);
-  cx.restore();
-
-  // ── NOSTROMO GLYCOL CHILLER ───────────────────────────────────
-  rr(nchX,nchY,nchW,nchH,6,'#060c18',st.charging?C.chg:'#334155',1.4);
-  t('N. GLYCOL CHILLER',nchX+nchW/2,nchY+10,'#a5b4fc',10,'700');
-  // condenser row
-  rr(nchX+6,nchY+20,nchW-12,18,2,'#0a1018','#1e3050',0.7);
-  t('CONDENSER',nchX+nchW/2,nchY+30,'#475569',7,'600');
-  // compressor circle
-  cx.beginPath();
-  cx.arc(X(nchX+nchW/2),Y(nchY+54),D(13),0,Math.PI*2);
-  cx.fillStyle='#0a1018';
-  cx.fill();
-  cx.strokeStyle=st.charging?C.chg:'#334155';
-  cx.lineWidth=D(1.2);
-  cx.setLineDash([]);
-  cx.stroke();
-  t('COMP',nchX+nchW/2,nchY+54,'#94a3b8',6.5,'700');
-  // evaporator row
-  rr(nchX+6,nchY+70,nchW-12,14,2,'#0a1018',st.charging?'rgba(96,165,250,0.4)':'#1e3050',0.7);
-  t('EVAPORATOR',nchX+nchW/2,nchY+78,'#475569',7,'600');
-  // charging animation indicator
-  if(st.charging){
-    glow(nchX+nchW/2,nchY+nchH/2,60,C.chg,0.12);
+  cx.beginPath(); cx.rect(X(bBar),Y(yBar),D(wBar),D(hBar)); cx.fillStyle='#0a0e18'; cx.fill();
+  cx.fillStyle='rgba(56,189,248,0.38)';
+  cx.fillRect(X(bBar),Y(yBar),D(wBar*(itLoad/CAP)),D(hBar));
+  cx.fillStyle='rgba(248,113,113,0.38)';
+  cx.fillRect(X(bBar+wBar*(itLoad/CAP)),Y(yBar),D(wBar*(st.chEff/CAP)),D(hBar));
+  if(st.charging&&st.chargeKW>0){
+    cx.fillStyle='rgba(96,165,250,0.55)';
+    cx.fillRect(X(bBar+wBar*((itLoad+st.chEff)/CAP)),Y(yBar),D(wBar*(st.chargeKW/CAP)),D(hBar));
   }
+  cx.strokeStyle='#ef4444'; cx.lineWidth=D(1.2); cx.setLineDash([]);
+  cx.beginPath(); cx.moveTo(X(bBar+wBar),Y(yBar-2)); cx.lineTo(X(bBar+wBar),Y(yBar+hBar+2)); cx.stroke();
+  cx.restore();
+  t('cap 32',bBar+wBar+3,yBar+3,'#ef4444',7,'700','left');
+
+  // ── NOSTROMO GLYCOL CHILLER (simplified) ─────────────────────
+  if(st.charging) glow(nchX+nchW/2,nchY+nchH/2,55,C.chg,0.16);
+  rr(nchX,nchY,nchW,nchH,6,'#060c18',st.charging?C.chg:'#1e3050',st.charging?1.8:1.2);
+  t('NOSTROMO CHILLER',nchX+nchW/2,nchY+14,'#a5b4fc',11,'700');
+  t(st.charging?'● CHARGING':'○ IDLE',nchX+nchW/2,nchY+28,st.charging?C.chg:'#2a3d5c',9,'700');
+  // Spinning fan icon
+  var fanCx=nchX+nchW/2, fanCy=nchY+60, fanR=20;
+  cx.beginPath(); cx.arc(X(fanCx),Y(fanCy),D(fanR),0,Math.PI*2);
+  cx.fillStyle='#060a10'; cx.fill();
+  cx.strokeStyle=st.charging?C.chg:'#1e3050'; cx.lineWidth=D(1.2); cx.setLineDash([]); cx.stroke();
+  cx.save(); cx.translate(X(fanCx),Y(fanCy));
+  if(st.charging) cx.rotate(fC*0.08);
+  for(var bi=0;bi<4;bi++){
+    cx.rotate(Math.PI/2);
+    cx.fillStyle=st.charging?colA(C.chg,0.65):'rgba(30,48,80,0.8)';
+    cx.beginPath(); cx.moveTo(0,0); cx.lineTo(D(fanR-3),0); cx.lineTo(D(fanR-3),D(-5)); cx.lineTo(D(3),D(-2)); cx.closePath(); cx.fill();
+  }
+  cx.restore();
 
   // ── ICEBRICKS TES ─────────────────────────────────────────────
   var shimmer=0.26+st.soc*0.16+0.06*Math.sin(Date.now()/700);
@@ -800,7 +818,7 @@ function drawAll(h,st,fW,fG,fC){
 
   // SOC percentage text
   var socPct2=Math.round(st.soc*100);
-  t(socPct2+'%',icesX+icesW/2,icesY+icesH/2-8,'#ffffff',22,'700');
+  tm(socPct2+'%',icesX+icesW/2,icesY+icesH/2-8,'#ffffff',22,'700');
   t('STATE OF CHARGE',icesX+icesW/2,icesY+icesH/2+10,'#94a3b8',7,'600');
 
   // port indicators
@@ -835,7 +853,7 @@ function drawAll(h,st,fW,fG,fC){
     {col:C.cold,label:'COLD GLYCOL'},
     {col:C.warm,label:'WARM GLYCOL'},
     {col:C.chg,label:'CHARGE LOOP'},
-    {col:C.cmd,label:'OPTIMIZER'},
+    {col:'#fbbf24',label:'GRID POWER'},
     {col:C.plate,label:'HX / PLATE'}
   ];
   var fkStartX=12, fkY=543, fkSpacing=128;
