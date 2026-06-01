@@ -25,6 +25,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:10px;heigh
 .tbtn:hover{background:#13203a}
 #playbtn{padding:4px 14px;background:#0b1e38;border:1px solid #1d4ed8;border-radius:6px;color:#60a5fa;font-size:10px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif}
 #playbtn:hover{background:#152d52}
+#graphbar{height:130px;background:#080c14;border-top:1px solid #14213a;flex-shrink:0;position:relative}
+#gcv{display:block;width:100%;height:100%}
 #scenebar{height:32px;background:#080c14;border-top:1px solid #14213a;
   display:flex;align-items:center;gap:8px;padding:0 14px;flex-shrink:0}
 .scl{font-size:9px;color:#2a3d5c;font-family:'Outfit',sans-serif;white-space:nowrap;font-weight:600}
@@ -63,6 +65,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:10px;heigh
   <canvas id="cv"></canvas>
 </div>
 
+<div id="graphbar">
+  <canvas id="gcv"></canvas>
+</div>
+
 <div id="scenebar">
   <span class="scl">IT Load</span>
   <input type="range" id="si" min="18" max="22" step="0.1" value="20"/>
@@ -86,6 +92,11 @@ const VW=920, VH=548;
 
 var cv=document.getElementById('cv');
 var cx=cv.getContext('2d');
+var gcv=document.getElementById('gcv');
+var gx=gcv.getContext('2d');
+function resizeGraph(){gcv.width=gcv.offsetWidth;gcv.height=gcv.offsetHeight;}
+resizeGraph();
+window.addEventListener('resize',resizeGraph);
 
 // ── cooling mode toggle ───────────────────────────────────────
 var coolingMode='crah'; // 'crah' or 'dlc'
@@ -582,6 +593,223 @@ function drawDLC(dcX,dcY,dcW,dcH){
   solidLine([[cduX+cduW/2,cduY+cduH],[cduX+cduW/2,loopY],[cpStartX+cpW/2,loopY],[cpStartX+cpW/2,cduY+4]],'rgba(56,189,248,0.4)',0.8);
 }
 
+// ── graph draw function ───────────────────────────────────────
+function drawGraph(h,st){
+  var W=gcv.width, H=gcv.height;
+  var marginL=36, marginR=12, marginT=14, marginB=22;
+  var gW=W-marginL-marginR, gH=H-marginT-marginB;
+  function gX(hour){ return marginL + (hour/24)*gW; }
+  function gY(mw){ return marginT + gH - (mw/CAP)*gH; }
+
+  // clear
+  gx.clearRect(0,0,W,H);
+
+  // ── Layer 1: background window shading ───────────────────────
+  // Charge window: 0..8 and 22..24
+  gx.fillStyle='rgba(96,165,250,0.07)';
+  gx.fillRect(gX(0),marginT,gX(8)-gX(0),gH);
+  gx.fillRect(gX(22),marginT,gX(24)-gX(22),gH);
+  // Charge window label
+  gx.save();
+  gx.fillStyle='#60a5fa';
+  gx.font='700 7px "JetBrains Mono","Courier New",monospace';
+  gx.textAlign='left';
+  gx.textBaseline='top';
+  gx.fillText('CHARGE WINDOW',gX(0)+3,marginT+2);
+  gx.restore();
+  // Discharge window: 12..20
+  gx.fillStyle='rgba(52,211,153,0.07)';
+  gx.fillRect(gX(12),marginT,gX(20)-gX(12),gH);
+  // Discharge window label
+  gx.save();
+  gx.fillStyle='#34d399';
+  gx.font='700 7px "JetBrains Mono","Courier New",monospace';
+  gx.textAlign='left';
+  gx.textBaseline='top';
+  gx.fillText('DISCHARGE WINDOW',gX(12)+3,marginT+2);
+  gx.restore();
+
+  // ── Layer 2: grid lines ───────────────────────────────────────
+  // Horizontal dashed lines at 0, 10, 20, 32 MW
+  var gridMW=[0,10,20,32];
+  gx.save();
+  gx.strokeStyle='#14213a';
+  gx.lineWidth=0.5;
+  gx.setLineDash([3,3]);
+  gx.font='400 7px "JetBrains Mono","Courier New",monospace';
+  gx.fillStyle='#2a3d5c';
+  gx.textAlign='right';
+  gx.textBaseline='middle';
+  gridMW.forEach(function(mw){
+    var y=gY(mw);
+    gx.beginPath();
+    gx.moveTo(gX(0),y);
+    gx.lineTo(gX(24),y);
+    gx.stroke();
+    gx.fillText(mw,marginL-3,y);
+  });
+  gx.restore();
+  // Vertical tick marks every 2h
+  gx.save();
+  gx.strokeStyle='#14213a';
+  gx.lineWidth=0.5;
+  gx.setLineDash([]);
+  gx.font='400 7px "JetBrains Mono","Courier New",monospace';
+  gx.fillStyle='#2a3d5c';
+  gx.textAlign='center';
+  gx.textBaseline='top';
+  for(var th=0;th<=24;th+=2){
+    var tx=gX(th);
+    gx.beginPath();
+    gx.moveTo(tx,marginT+gH);
+    gx.lineTo(tx,marginT+gH+3);
+    gx.stroke();
+    gx.fillText(th+'h',tx,marginT+gH+5);
+  }
+  gx.restore();
+
+  // ── Layer 3: filled area chart (meter load) ───────────────────
+  var pts=[];
+  for(var si=0;si<=96;si++){
+    var hh=si/96*24;
+    pts.push({hh:hh,mw:state(hh).meter});
+  }
+  // filled area
+  gx.save();
+  var areaGrad=gx.createLinearGradient(0,marginT,0,marginT+gH);
+  areaGrad.addColorStop(0,'rgba(56,189,248,0.22)');
+  areaGrad.addColorStop(1,'rgba(56,189,248,0.04)');
+  gx.fillStyle=areaGrad;
+  gx.beginPath();
+  gx.moveTo(gX(0),gY(0));
+  pts.forEach(function(p){ gx.lineTo(gX(p.hh),gY(p.mw)); });
+  gx.lineTo(gX(24),gY(0));
+  gx.closePath();
+  gx.fill();
+  // stroke top line
+  gx.strokeStyle='#38bdf8';
+  gx.lineWidth=1.5;
+  gx.setLineDash([]);
+  gx.beginPath();
+  pts.forEach(function(p,i){
+    if(i===0) gx.moveTo(gX(p.hh),gY(p.mw));
+    else gx.lineTo(gX(p.hh),gY(p.mw));
+  });
+  gx.stroke();
+  gx.restore();
+
+  // ── Layer 4: reference lines ──────────────────────────────────
+  gx.save();
+  gx.font='700 7px "JetBrains Mono","Courier New",monospace';
+  gx.textBaseline='middle';
+  gx.textAlign='left';
+  var labelX=gX(24)+2;
+  // IT load line
+  gx.globalAlpha=0.5;
+  gx.strokeStyle='#38bdf8';
+  gx.lineWidth=1;
+  gx.setLineDash([4,4]);
+  gx.beginPath();
+  gx.moveTo(gX(0),gY(itLoad));
+  gx.lineTo(gX(24),gY(itLoad));
+  gx.stroke();
+  gx.globalAlpha=1;
+  gx.fillStyle='#38bdf8';
+  gx.fillText('IT LOAD',labelX,gY(itLoad));
+  // Chiller minimum line (itLoad+3)
+  gx.globalAlpha=0.5;
+  gx.strokeStyle='#fbbf24';
+  gx.setLineDash([4,4]);
+  gx.beginPath();
+  gx.moveTo(gX(0),gY(itLoad+3));
+  gx.lineTo(gX(24),gY(itLoad+3));
+  gx.stroke();
+  gx.globalAlpha=1;
+  gx.fillStyle='#fbbf24';
+  gx.fillText('CHILL MIN',labelX,gY(itLoad+3));
+  // Site cap line (solid)
+  gx.globalAlpha=1;
+  gx.strokeStyle='#ef4444';
+  gx.lineWidth=1;
+  gx.setLineDash([]);
+  gx.beginPath();
+  gx.moveTo(gX(0),gY(CAP));
+  gx.lineTo(gX(24),gY(CAP));
+  gx.stroke();
+  gx.fillStyle='#ef4444';
+  gx.fillText('CAP 32',labelX,gY(CAP));
+  gx.restore();
+
+  // ── Layer 5: trigger zone callouts ───────────────────────────
+  var triggers=[
+    {hv:8,  col:'#60a5fa', lbl:'← charge ends'},
+    {hv:12, col:'#34d399', lbl:'discharge →'},
+    {hv:20, col:'#fbbf24', lbl:'peak ends →'},
+    {hv:22, col:'#60a5fa', lbl:'← charge'}
+  ];
+  gx.save();
+  gx.font='700 6px "JetBrains Mono","Courier New",monospace';
+  gx.textBaseline='top';
+  triggers.forEach(function(tr){
+    var tx=gX(tr.hv);
+    gx.globalAlpha=0.6;
+    gx.strokeStyle=tr.col;
+    gx.lineWidth=1;
+    gx.setLineDash([3,3]);
+    gx.beginPath();
+    gx.moveTo(tx,marginT);
+    gx.lineTo(tx,marginT+gH);
+    gx.stroke();
+    gx.globalAlpha=1;
+    gx.fillStyle=tr.col;
+    gx.textAlign='center';
+    gx.fillText(tr.lbl,tx,marginT+gH+13);
+  });
+  gx.restore();
+
+  // ── Layer 6: now cursor ───────────────────────────────────────
+  var nowX=gX(h);
+  var nowY=gY(st.meter);
+  // vertical line
+  gx.save();
+  gx.globalAlpha=0.7;
+  gx.strokeStyle='#ffffff';
+  gx.lineWidth=1;
+  gx.setLineDash([]);
+  gx.beginPath();
+  gx.moveTo(nowX,marginT);
+  gx.lineTo(nowX,marginT+gH);
+  gx.stroke();
+  gx.restore();
+  // circle at intersection
+  gx.save();
+  gx.globalAlpha=0.9;
+  gx.fillStyle='#ffffff';
+  gx.beginPath();
+  gx.arc(nowX,nowY,3,0,Math.PI*2);
+  gx.fill();
+  gx.restore();
+  // pill label above circle
+  var labelTxt=st.meter.toFixed(1)+' MW';
+  gx.save();
+  gx.font='700 7px "JetBrains Mono","Courier New",monospace';
+  gx.textAlign='center';
+  gx.textBaseline='bottom';
+  var tw=gx.measureText(labelTxt).width;
+  var pillPad=4;
+  var pillW=tw+pillPad*2;
+  var pillH=11;
+  var pillX=nowX-pillW/2;
+  var pillY=nowY-6-pillH;
+  gx.fillStyle='rgba(15,23,42,0.82)';
+  gx.beginPath();
+  gx.roundRect(pillX,pillY,pillW,pillH,4);
+  gx.fill();
+  gx.fillStyle='#ffffff';
+  gx.fillText(labelTxt,nowX,nowY-6);
+  gx.restore();
+}
+
 // ── main draw function ────────────────────────────────────────
 function drawAll(h,st,fW,fG,fC){
   // background
@@ -998,6 +1226,7 @@ function loop(now){
   var h=progress*24;
   var st=state(h);
   drawAll(h,st,fW,fG,fC);
+  drawGraph(h,st);
   updateHUD(h,st);
 }
 requestAnimationFrame(loop);
