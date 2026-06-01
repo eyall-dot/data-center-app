@@ -261,6 +261,66 @@ function solidLine(pts,col,lw){
   cx.restore();
 }
 
+// ── pipe label (pill badge) ───────────────────────────────────
+function pipeLabel(lbl,vx,vy,col,alpha){
+  if((alpha||1)<0.25) return;
+  cx.save();
+  cx.globalAlpha=alpha||1;
+  var fs=D(6.5);
+  cx.font='700 '+fs+'px "JetBrains Mono","Courier New",monospace';
+  cx.textAlign='center'; cx.textBaseline='middle';
+  var tw=cx.measureText(lbl).width;
+  var padX=D(4), padY=D(3.5);
+  var px=X(vx), py=Y(vy);
+  // pill background
+  cx.beginPath();
+  if(cx.roundRect){
+    cx.roundRect(px-tw/2-padX, py-padY, tw+padX*2, padY*2, D(2));
+  } else {
+    cx.rect(px-tw/2-padX, py-padY, tw+padX*2, padY*2);
+  }
+  cx.fillStyle='rgba(8,12,20,0.85)';
+  cx.fill();
+  cx.strokeStyle=col; cx.lineWidth=0.8; cx.setLineDash([]); cx.stroke();
+  cx.fillStyle=col;
+  cx.fillText(lbl,px,py);
+  cx.restore();
+}
+
+// ── flow dots traveling along a polyline ─────────────────────
+function flowDots(pts,col,offset,alpha,nDots){
+  if(alpha<0.3||pts.length<2) return;
+  var segs=[];
+  var total=0;
+  for(var i=1;i<pts.length;i++){
+    var dx=pts[i][0]-pts[i-1][0], dy=pts[i][1]-pts[i-1][1];
+    var len=Math.sqrt(dx*dx+dy*dy);
+    segs.push({x0:pts[i-1][0],y0:pts[i-1][1],x1:pts[i][0],y1:pts[i][1],len:len,cum:total});
+    total+=len;
+  }
+  var n=nDots||4;
+  for(var di=0;di<n;di++){
+    var tPos=((offset*0.6+di*(total/n))%total+total)%total;
+    for(var si=0;si<segs.length;si++){
+      var seg=segs[si];
+      if(tPos<=seg.cum+seg.len||si===segs.length-1){
+        var frac=seg.len>0?(tPos-seg.cum)/seg.len:0;
+        frac=Math.max(0,Math.min(1,frac));
+        var dotX=seg.x0+frac*(seg.x1-seg.x0);
+        var dotY=seg.y0+frac*(seg.y1-seg.y0);
+        cx.save();
+        cx.globalAlpha=alpha*0.75;
+        cx.beginPath();
+        cx.arc(X(dotX),Y(dotY),D(2),0,Math.PI*2);
+        cx.fillStyle=col;
+        cx.fill();
+        cx.restore();
+        break;
+      }
+    }
+  }
+}
+
 function arrow(x,y,ang,col,sz,alpha){
   cx.save();
   cx.globalAlpha=alpha||1;
@@ -358,12 +418,13 @@ function hxRect(x,y,w,h,alpha){
   cx.fillStyle='rgba(129,140,248,0.10)';
   cx.fillRect(X(x+3),Y(y+3),D(w-6),D(6));
   cx.fillRect(X(x+3),Y(y+h-9),D(w-6),D(6));
-  cx.strokeStyle='rgba(129,140,248,0.30)';
-  cx.lineWidth=D(0.7);
   cx.setLineDash([]);
   var plates=10;
   for(var i=1;i<plates;i++){
     var px=x+(w/plates)*i;
+    // alternating colors: even=water side (blue), odd=glycol side (teal)
+    cx.strokeStyle=i%2===0?'rgba(56,189,248,0.4)':'rgba(52,211,153,0.4)';
+    cx.lineWidth=D(0.9);
     cx.beginPath();
     cx.moveTo(X(px),Y(y+11));
     cx.lineTo(X(px),Y(y+h-11));
@@ -388,6 +449,17 @@ function hxRect(x,y,w,h,alpha){
   t('PLATE HX',x+w/2,y-9,C.plate,8,'700');
   t('HX',x+w/2,y+h/2-8,'#c7d2fe',9,'700');
   t('water⇄glycol',x+w/2,y+h/2+8,'#5b6db8',6.5,'600');
+  // CHW / GLY fluid-side labels
+  cx.globalAlpha=(alpha||1)*0.85;
+  cx.font='700 '+D(6)+'px "JetBrains Mono","Courier New",monospace';
+  cx.textBaseline='top';
+  cx.setLineDash([]);
+  cx.textAlign='left';
+  cx.fillStyle='rgba(56,189,248,0.75)';
+  cx.fillText('CHW',X(x+4),Y(y+13));
+  cx.textAlign='right';
+  cx.fillStyle='rgba(52,211,153,0.75)';
+  cx.fillText('GLY',X(x+w-4),Y(y+13));
   cx.restore();
 }
 
@@ -948,6 +1020,37 @@ function drawAll(h,st,fW,fG,fC){
   // Warm return from IceBricks warm port → N.Chiller
   pipe([[icesX,icesPortWarmY],[nchX+nchW,icesPortWarmY],[nchX+nchW,nchBotY-10],[nchBotX,nchBotY-10],[nchBotX,nchBotY]],C.warm,3,fC*0.85,aC*0.7);
 
+  // ── FLOW DOTS ────────────────────────────────────────────────
+  // Supply: chiller outlet → down left side → DC supply port
+  flowDots([[chBotX,chBotY],[chBotX,dcTopY-14],[dcTopX,dcTopY-14],[dcTopX,dcTopY]],C.sup,fW,aW,4);
+  // Return: DC right → up → chiller return
+  flowDots([[dcRightX,dcRightY],[dcRightX,chRightY+20],[chRightX,chRightY+20],[chRightX,chRightY]],C.ret,fW*0.9,aW,4);
+  // Chiller supply → HX top-left
+  flowDots([[chOutX,chOutY],[hxX,chOutY],[hxX,hxY+14]],C.sup,fW,aW,3);
+  // Cold glycol: IceBricks → V1 → V2 → HX
+  flowDots([[icesX,icesPortColdY],[v1X,icesPortColdY],[v1X,v1Y+18]],C.cold,fG,aD,3);
+  flowDots([[v1X,v1Y-18],[v1X,v2Y],[v2X+18,v2Y]],C.cold,fG,aD,3);
+  flowDots([[v2X-18,v2Y],[hxX+hxW,v2Y],[hxX+hxW,hxY+hxH-14]],C.mix,fG,aD,3);
+  // Warm glycol: HX → IceBricks warm port
+  flowDots([[hxX+hxW,hxY+14],[hxX+hxW,icesPortWarmY-10],[icesX,icesPortWarmY]],C.warm,fG,aD*0.8,3);
+  // Charge loop: N.Chiller → V1 → IceBricks
+  flowDots([[nchBotX,nchBotY],[nchBotX,v1Y],[v1X+18,v1Y]],C.chg,fC,aC,3);
+  // Warm return: IceBricks → N.Chiller
+  flowDots([[icesX,icesPortWarmY],[nchX+nchW,icesPortWarmY],[nchX+nchW,nchBotY-10],[nchBotX,nchBotY-10],[nchBotX,nchBotY]],C.warm,fC*0.85,aC*0.7,3);
+
+  // ── PIPE LABELS ──────────────────────────────────────────────
+  // CHW supply midpoint: runs from chBotY down to dcTopY, on chBotX=38
+  // label offset to the right so it doesn't clip the zone border
+  pipeLabel('44°F CHW SUP',chBotX+22,(chBotY+dcTopY)/2,C.sup,aW);
+  // CHW return midpoint: runs from dcRightY up to chRightY on dcRightX=158
+  pipeLabel('56°F CHW RET',dcRightX+20,(dcRightY+chRightY)/2,C.ret,aW);
+  // Cold glycol from IceBricks: midpoint of [[icesX,icesPortColdY],[v1X,icesPortColdY]]
+  pipeLabel('28°F GLY',(icesX+v1X)/2,icesPortColdY-11,C.cold,aD);
+  // Warm glycol: midpoint of HX→IceBricks warm, at HX+hxW horizontal run
+  pipeLabel('38°F GLY',(hxX+hxW+icesX)/2,icesPortWarmY-11,C.warm,aD);
+  // Charge loop: midpoint of nchBotX→v1Y vertical run
+  pipeLabel('CHG GLY',nchBotX+18,(nchBotY+v1Y)/2,C.chg,aC);
+
   // ── ISA INSTRUMENTS ──────────────────────────────────────────
   // Level 3 — subdued
   cx.globalAlpha=0.5;
@@ -998,9 +1101,34 @@ function drawAll(h,st,fW,fG,fC){
       cx.setLineDash([]);
       cx.stroke();
       cx.restore();
+      // spinning fan blades for active units
+      if(isOn){
+        cx.save();
+        cx.translate(X(ux+uW/2),Y(uy+uH/2));
+        cx.rotate(fW*0.06);
+        for(var fi=0;fi<3;fi++){
+          cx.rotate(Math.PI*2/3);
+          cx.beginPath();
+          cx.moveTo(0,0);
+          cx.lineTo(D(uH/2-3),0);
+          cx.lineTo(D(uH/2-3),D(-2.5));
+          cx.lineTo(D(1.5),D(-1));
+          cx.closePath();
+          cx.fillStyle='rgba(248,113,113,0.45)';
+          cx.fill();
+        }
+        cx.restore();
+      }
     }
   }
   t('60°F SUPPLY',chillerX+chillerW/2,chillerY+chillerH-8,'#38bdf8',7,'700');
+
+  // ── COP READOUT (below chiller array right side) ──────────────
+  var cop=Math.min(6.0,Math.max(2.5,itLoad/Math.max(0.1,st.chEff)));
+  var copX=chillerX+chillerW-54, copY=chillerY+chillerH+4;
+  rr(copX,copY,54,30,3,'#060a10',C.cold,0.8);
+  t('COP',copX+27,copY+9,'#2a3d5c',6.5,'700');
+  tm(cop.toFixed(2),copX+27,copY+21,C.cold,10,'700');
 
   // ── DATA CENTER (left zone, lower) ───────────────────────────
   var dcLabel=coolingMode==='crah'?'CRAH UNITS · IT HALL A':'CDU + COLD PLATES · IT HALL A';
@@ -1081,6 +1209,22 @@ function drawAll(h,st,fW,fG,fC){
     cx.moveTo(X(icesX+4),Y(fillY));
     cx.lineTo(X(icesX+icesW-4),Y(fillY));
     cx.stroke();
+  }
+  // ice brick rows inside fill
+  var brickH=5, brickGap=3, brickW=(icesW-16)*0.82;
+  var brickX=icesX+8+(icesW-16-brickW)/2;
+  var numBricks=Math.floor(fillH/(brickH+brickGap));
+  for(var bi=0;bi<numBricks;bi++){
+    var by=fillY+fillH-brickH-(bi*(brickH+brickGap));
+    if(by<icesY+34) break;
+    var shimAlpha=0.18+0.12*Math.sin(Date.now()/800+bi*0.7);
+    cx.save();
+    cx.globalAlpha=shimAlpha;
+    cx.fillStyle='#e0f2fe';
+    cx.beginPath();
+    cx.rect(X(brickX),Y(by),D(brickW),D(brickH));
+    cx.fill();
+    cx.restore();
   }
   cx.restore();
 
