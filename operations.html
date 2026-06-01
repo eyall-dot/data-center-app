@@ -466,7 +466,7 @@ function hxRect(x,y,w,h,alpha){
 // ── V1 valve (3-way, charge/discharge/standby) ────────────────
 function drawV1(vcx2,vcy,mode,alpha){
   var col=mode==='charge'?C.chg:mode==='discharge'?C.warm:'#475569';
-  if(mode!=='standby') glow(vcx2,vcy,28,mode==='charge'?'#3b82f6':'#f59e0b',alpha*0.22);
+  if(mode!=='standby') glow(vcx2,vcy,28,mode==='charge'?C.chg:C.warm,alpha*0.22);
   actuator(vcx2,vcy-18,col);
   cx.save();
   cx.globalAlpha=0.6+alpha*0.4;
@@ -511,8 +511,8 @@ function drawV1(vcx2,vcy,mode,alpha){
 
 // ── V2 valve (3-way mixing) ───────────────────────────────────
 function drawV2(vcx2,vcy,alpha,mixPct){
-  var col=alpha>0.3?'#a78bfa':'#475569';
-  if(alpha>0.3) glow(vcx2,vcy,26,'#8b5cf6',alpha*0.22);
+  var col=alpha>0.3?C.cmd:'#475569';
+  if(alpha>0.3) glow(vcx2,vcy,26,C.cmd,alpha*0.22);
   actuator(vcx2,vcy-18,col);
   cx.save();
   cx.globalAlpha=0.6+alpha*0.4;
@@ -591,78 +591,127 @@ function drawMeterArc(x,y,r,val,mn,mx,tgt,cap,label){
 
 // ── CRAH wavy coil draw ───────────────────────────────────────
 function drawCRAH(dcX,dcY,dcW,dcH,supCol){
-  // 3 wavy coil rows
-  var coilRows=3;
-  var coilStartY=dcY+32;
-  var coilSpacing=(dcH-55)/coilRows;
+  // mode label badge
   cx.save();
-  cx.strokeStyle=supCol;
-  cx.lineWidth=D(1.5);
+  cx.fillStyle='rgba(56,189,248,0.12)';
+  cx.strokeStyle='rgba(56,189,248,0.4)';
+  cx.lineWidth=D(0.8);
   cx.setLineDash([]);
+  cx.beginPath();
+  if(cx.roundRect){cx.roundRect(X(dcX+4),Y(dcY+20),D(dcW-8),D(10),D(2));}else{cx.rect(X(dcX+4),Y(dcY+20),D(dcW-8),D(10));}
+  cx.fill(); cx.stroke();
+  cx.restore();
+  t('AIR COOLING · CRAH',dcX+dcW/2,dcY+25,'#38bdf8',6,'700');
+  // 3 wavy coil rows with better amplitude and contrast
+  var coilRows=3;
+  var coilStartY=dcY+34;
+  var coilSpacing=(dcH-60)/coilRows;
+  cx.save();
   for(var ci=0;ci<coilRows;ci++){
     var cy2=coilStartY+ci*coilSpacing+coilSpacing/2;
+    // supply side (cold, blue)
+    cx.strokeStyle=supCol;
+    cx.lineWidth=D(2);
+    cx.setLineDash([]);
     cx.beginPath();
-    var steps=60;
+    var steps=72;
     for(var si=0;si<=steps;si++){
       var px=dcX+6+(dcW-12)*si/steps;
-      var py=cy2+2.5*Math.sin(si/steps*Math.PI*5);
+      var py=cy2+4*Math.sin(si/steps*Math.PI*6);
       if(si===0) cx.moveTo(X(px),Y(py));
       else cx.lineTo(X(px),Y(py));
     }
     cx.stroke();
+    // warm return highlight (thin, red, offset by half-period)
+    cx.strokeStyle='rgba(248,113,113,0.35)';
+    cx.lineWidth=D(0.8);
+    cx.beginPath();
+    for(var si2=0;si2<=steps;si2++){
+      var px2=dcX+6+(dcW-12)*si2/steps;
+      var py2=cy2-4*Math.sin(si2/steps*Math.PI*6);
+      if(si2===0) cx.moveTo(X(px2),Y(py2));
+      else cx.lineTo(X(px2),Y(py2));
+    }
+    cx.stroke();
   }
-  // 3 airflow arrows
+  cx.restore();
+  // 3 airflow arrows (upward, larger)
   var arrowSpacing=(dcW-20)/3;
   for(var ai=0;ai<3;ai++){
     var ax=dcX+10+ai*arrowSpacing+arrowSpacing/2;
     var ay=dcY+dcH-14;
-    cx.fillStyle='#475569';
+    cx.save();
+    cx.fillStyle='rgba(148,163,184,0.55)';
     cx.beginPath();
-    cx.moveTo(X(ax),Y(ay+5));
-    cx.lineTo(X(ax-4),Y(ay-1));
-    cx.lineTo(X(ax-1.5),Y(ay-1));
-    cx.lineTo(X(ax-1.5),Y(ay-7));
-    cx.lineTo(X(ax+1.5),Y(ay-7));
-    cx.lineTo(X(ax+1.5),Y(ay-1));
-    cx.lineTo(X(ax+4),Y(ay-1));
+    cx.moveTo(X(ax),Y(ay+6));
+    cx.lineTo(X(ax-5),Y(ay-1));
+    cx.lineTo(X(ax-2),Y(ay-1));
+    cx.lineTo(X(ax-2),Y(ay-8));
+    cx.lineTo(X(ax+2),Y(ay-8));
+    cx.lineTo(X(ax+2),Y(ay-1));
+    cx.lineTo(X(ax+5),Y(ay-1));
     cx.closePath();
     cx.fill();
+    cx.restore();
   }
-  cx.restore();
 }
 
 // ── DLC (CDU + cold plates) draw ─────────────────────────────
 function drawDLC(dcX,dcY,dcW,dcH){
-  // CDU sub-box (left 40%)
-  var cduW=dcW*0.38;
+  // mode label badge — distinct purple for DLC
+  cx.save();
+  cx.fillStyle='rgba(167,139,250,0.14)';
+  cx.strokeStyle='rgba(167,139,250,0.5)';
+  cx.lineWidth=D(0.8);
+  cx.setLineDash([]);
+  cx.beginPath();
+  if(cx.roundRect){cx.roundRect(X(dcX+4),Y(dcY+20),D(dcW-8),D(10),D(2));}else{cx.rect(X(dcX+4),Y(dcY+20),D(dcW-8),D(10));}
+  cx.fill(); cx.stroke();
+  cx.restore();
+  t('DIRECT LIQUID COOL',dcX+dcW/2,dcY+25,'#a78bfa',6,'700');
+  // CDU sub-box (left 42%) — clearly labeled with blue border
+  var cduW=dcW*0.42;
   var cduH=dcH-36;
   var cduX=dcX+4;
-  var cduY=dcY+28;
-  rr(cduX,cduY,cduW,cduH,3,'rgba(30,58,138,0.25)','#3b82f6',0.9);
-  t('CDU',cduX+cduW/2,cduY+cduH/2,'#93c5fd',8,'700');
-  // Cold-plate server bars (right 55%)
+  var cduY=dcY+32;
+  rr(cduX,cduY,cduW,cduH,3,'rgba(30,58,138,0.30)',C.chg,1.2);
+  t('CDU',cduX+cduW/2,cduY+8,'#93c5fd',7,'700');
+  t('COOL',cduX+cduW/2,cduY+17,'#93c5fd',6,'600');
+  t('DIST',cduX+cduW/2,cduY+25,'#93c5fd',6,'600');
+  t('UNIT',cduX+cduW/2,cduY+34,'#93c5fd',6,'600');
+  // pump symbol inside CDU
+  cx.save();
+  cx.beginPath(); cx.arc(X(cduX+cduW/2),Y(cduY+cduH-12),D(7),0,Math.PI*2);
+  cx.strokeStyle=C.chg; cx.lineWidth=D(1); cx.setLineDash([]); cx.stroke();
+  cx.fillStyle='rgba(30,58,138,0.5)'; cx.fill();
+  cx.restore();
+  t('P',cduX+cduW/2,cduY+cduH-12,'#60a5fa',6,'700');
+  // Cold-plate server bars (right side) — thicker, more distinct
   var cpStartX=dcX+cduW+10;
-  var cpW=dcW-cduW-18;
-  var cpH=9;
+  var cpW=dcW-cduW-16;
+  var cpH=11;
   var cpCount=5;
   var cpSpacing=(cduH-8)/cpCount;
   cx.save();
   for(var cpi=0;cpi<cpCount;cpi++){
     var cpY2=cduY+4+cpi*cpSpacing;
     var cpGrad=cx.createLinearGradient(X(cpStartX),Y(cpY2),X(cpStartX+cpW),Y(cpY2));
-    cpGrad.addColorStop(0,'rgba(56,189,248,0.55)');
+    cpGrad.addColorStop(0,'rgba(56,189,248,0.65)');
+    cpGrad.addColorStop(0.5,'rgba(167,139,250,0.30)');
     cpGrad.addColorStop(1,'rgba(248,113,113,0.55)');
     cx.fillStyle=cpGrad;
     cx.fillRect(X(cpStartX),Y(cpY2),D(cpW),D(cpH));
-    cx.strokeStyle='rgba(100,116,139,0.4)';
-    cx.lineWidth=D(0.5);
+    cx.strokeStyle='rgba(167,139,250,0.55)';
+    cx.lineWidth=D(0.8);
     cx.setLineDash([]);
     cx.strokeRect(X(cpStartX),Y(cpY2),D(cpW),D(cpH));
+    // cold-plate label
+    if(cpi===0) t('COLD PLATES',cpStartX+cpW/2,cpY2+cpH/2,'#c4b5fd',5,'700');
   }
   cx.restore();
-  // secondary coolant loop connecting CDU to cold plates
-  var loopY=cduY+cduH+5;
-  solidLine([[cduX+cduW/2,cduY+cduH],[cduX+cduW/2,loopY],[cpStartX+cpW/2,loopY],[cpStartX+cpW/2,cduY+4]],'rgba(56,189,248,0.4)',0.8);
+  // secondary coolant loop arrows
+  solidLine([[cduX+cduW,cduY+cduH/2],[cpStartX,cduY+cduH/2]],'rgba(56,189,248,0.5)',0.8);
+  arrow((cduX+cduW+cpStartX)/2,cduY+cduH/2,0,C.chg,3.5,0.8);
 }
 
 // ── graph draw function ───────────────────────────────────────
@@ -675,6 +724,15 @@ function drawGraph(h,st){
 
   // clear
   gx.clearRect(0,0,W,H);
+
+  // ── Graph title ───────────────────────────────────────────────
+  gx.save();
+  gx.fillStyle='#38bdf8';
+  gx.font='700 8px "JetBrains Mono","Courier New",monospace';
+  gx.textAlign='left';
+  gx.textBaseline='top';
+  gx.fillText('METER LOAD · 24h',marginL,2);
+  gx.restore();
 
   // ── Layer 1: background window shading ───────────────────────
   // Charge window: 0..8 and 22..24
@@ -801,14 +859,14 @@ function drawGraph(h,st){
   gx.fillText('CHILL MIN',labelX,gY(itLoad+3));
   // Site cap line (solid)
   gx.globalAlpha=1;
-  gx.strokeStyle='#ef4444';
+  gx.strokeStyle=C.ret;
   gx.lineWidth=1;
   gx.setLineDash([]);
   gx.beginPath();
   gx.moveTo(gX(0),gY(CAP));
   gx.lineTo(gX(24),gY(CAP));
   gx.stroke();
-  gx.fillStyle='#ef4444';
+  gx.fillStyle=C.ret;
   gx.fillText('CAP 32',labelX,gY(CAP));
   gx.restore();
 
@@ -889,8 +947,8 @@ function drawAll(h,st,fW,fG,fC){
   cx.fillRect(0,0,cv.width,cv.height);
 
   // ── COMPONENT POSITIONS ──────────────────────────────────────
-  // Main Meter: top-center
-  var meterX=360, meterY=8, meterW=200, meterH=72;
+  // Main Meter: top-center (shifted right to clear KPI panel)
+  var meterX=368, meterY=8, meterW=188, meterH=72;
   // Chiller Array: left zone upper
   var chillerX=18, chillerY=100, chillerW=160, chillerH=88;
   // Data Center: left zone lower
@@ -911,14 +969,37 @@ function drawAll(h,st,fW,fG,fC){
 
   // Data Centre zone (left)
   rr(8,90,380,440,10,'rgba(30,58,138,0.05)','rgba(59,130,246,0.22)',1.2);
-  t('◆  DATA CENTRE',198,103,'rgba(96,165,250,0.65)',9,'700');
+  // zone label with backdrop
+  cx.save(); cx.fillStyle='rgba(8,12,20,0.70)';
+  cx.beginPath(); if(cx.roundRect){cx.roundRect(X(100),Y(96),D(196),D(14),D(3));}else{cx.rect(X(100),Y(96),D(196),D(14));} cx.fill(); cx.restore();
+  t('◆  DATA CENTRE',198,103,'rgba(96,165,250,0.9)',9,'700');
 
   // Nostromo IceBrick zone (right)
   rr(530,90,382,440,10,'rgba(5,150,105,0.05)','rgba(52,211,153,0.2)',1.2);
-  t('◆  NOSTROMO ICEBRICK SYSTEM',721,103,'rgba(52,211,153,0.65)',9,'700');
+  // zone label with backdrop
+  cx.save(); cx.fillStyle='rgba(8,12,20,0.70)';
+  cx.beginPath(); if(cx.roundRect){cx.roundRect(X(600),Y(96),D(242),D(14),D(3));}else{cx.rect(X(600),Y(96),D(242),D(14));} cx.fill(); cx.restore();
+  t('◆  NOSTROMO ICEBRICK SYSTEM',721,103,'rgba(52,211,153,0.9)',9,'700');
 
   // ── MAIN METER BOX (top center) ──────────────────────────────
-  rr(meterX,meterY,meterW,meterH,6,'#060c18','#1d4ed8',1.6);
+  // Gradient fill for utility meter
+  var meterGrad=cx.createLinearGradient(X(meterX),Y(meterY),X(meterX),Y(meterY+meterH));
+  meterGrad.addColorStop(0,'rgba(29,78,216,0.08)');
+  meterGrad.addColorStop(1,'rgba(6,12,24,1)');
+  cx.save(); cx.fillStyle=meterGrad;
+  cx.beginPath(); if(cx.roundRect){cx.roundRect(X(meterX),Y(meterY),D(meterW),D(meterH),D(6));}else{cx.rect(X(meterX),Y(meterY),D(meterW),D(meterH));} cx.fill(); cx.restore();
+  rr(meterX,meterY,meterW,meterH,6,null,'#1d4ed8',1.6);
+  // Utility grid entry line — thin dashed vertical entering from top of meter box
+  cx.save();
+  cx.strokeStyle='#fbbf24'; cx.lineWidth=D(2); cx.globalAlpha=0.55;
+  cx.setLineDash([D(4),D(3)]);
+  cx.beginPath();
+  cx.moveTo(X(meterX+meterW/2),Y(meterY+2));
+  cx.lineTo(X(meterX+meterW/2),Y(meterY+14));
+  cx.stroke();
+  cx.globalAlpha=1; cx.restore();
+  // 'UTIL GRID' micro-label just inside top of meter box
+  t('↓ UTIL GRID',meterX+meterW/2,meterY+6,'rgba(251,191,36,0.55)',5.5,'600');
   t('MAIN METER',meterX+meterW/2,meterY+11,'#93c5fd',11,'700');
   t('SITE POWER · 32 MW CAP',meterX+meterW/2,meterY+23,'#1e3a5f',7,'600');
   // Meter arc gauge (compact, fits in box)
@@ -991,8 +1072,9 @@ function drawAll(h,st,fW,fG,fC){
   pipe([[chOutX,chOutY],[hxX,chOutY],[hxX,hxY+14]],C.sup,3.5,fW,aW);
   arrow((chOutX+hxX)/2,chOutY,0,C.sup,4.5,aW);
 
-  // HX water out bottom-left → return to chiller bottom
-  pipe([[hxX,hxY+hxH-14],[hxX,chRightY+20]],C.ret,3.5,fW*0.9,aW*0.7);
+  // HX water out bottom-left → runs up and left back to chiller return header
+  pipe([[hxX,hxY+hxH-14],[hxX,chRightY+20],[chRightX,chRightY+20]],C.ret,3.5,fW*0.9,aW*0.7);
+  arrow((hxX+chRightX)/2,chRightY+20,Math.PI,C.ret,4.5,aW*0.7);
 
   // Glycol discharge: IceBricks cold port (left side) → V2 → HX right ports
   // IceBricks left port at (icesX, icesY + icesH*0.35) = (700,248)
@@ -1019,6 +1101,7 @@ function drawAll(h,st,fW,fG,fC){
   arrow(nchBotX,(nchBotY+v1Y)/2,Math.PI/2,C.chg,4.5,aC);
   // Warm return from IceBricks warm port → N.Chiller
   pipe([[icesX,icesPortWarmY],[nchX+nchW,icesPortWarmY],[nchX+nchW,nchBotY-10],[nchBotX,nchBotY-10],[nchBotX,nchBotY]],C.warm,3,fC*0.85,aC*0.7);
+  arrow((icesX+nchX+nchW)/2,icesPortWarmY,Math.PI,C.warm,4.5,aC*0.7);
 
   // ── FLOW DOTS ────────────────────────────────────────────────
   // Supply: chiller outlet → down left side → DC supply port
@@ -1167,7 +1250,7 @@ function drawAll(h,st,fW,fG,fC){
   }
 
   // ── ICEBRICKS TES (far right, tall) ──────────────────────────
-  var shimmer=0.26+st.soc*0.16+0.06*Math.sin(Date.now()/700);
+  var shimmer=0.26+st.soc*0.16+0.06*Math.sin(fW*0.045);
   var tesGlowCol=st.discharging?C.cold:st.charging?C.chg:'#334155';
   if(st.discharging||st.charging) glow(icesX+icesW/2,icesY+icesH/2,icesW*0.7,tesGlowCol,0.14);
   rr(icesX,icesY,icesW,icesH,6,'#060c18',tesGlowCol,1.4);
@@ -1217,7 +1300,7 @@ function drawAll(h,st,fW,fG,fC){
   for(var bi=0;bi<numBricks;bi++){
     var by=fillY+fillH-brickH-(bi*(brickH+brickGap));
     if(by<icesY+34) break;
-    var shimAlpha=0.18+0.12*Math.sin(Date.now()/800+bi*0.7);
+    var shimAlpha=0.18+0.12*Math.sin(fW*0.04+bi*0.7);
     cx.save();
     cx.globalAlpha=shimAlpha;
     cx.fillStyle='#e0f2fe';
@@ -1232,12 +1315,25 @@ function drawAll(h,st,fW,fG,fC){
   // Phase banner centered above IceBricks fill area, inside Nostromo zone
   var phaseText=st.charging?'CHARGING':st.discharging?'DISCHARGING':(h>=8&&h<12?'STANDBY':'RESETTING');
   var phaseCol=st.charging?'#22d3ee':st.discharging?'#34d399':(h>=8&&h<12?'#334155':'#f97316');
-  // banner background
-  rr(icesX+4,icesY+36,icesW-8,24,4,colA(phaseCol,0.08),phaseCol,0.6);
-  t(phaseText,icesX+icesW/2,icesY+48,phaseCol,12,'800');
+  // banner background — taller to fit font size 18
+  rr(icesX+4,icesY+34,icesW-8,28,4,colA(phaseCol,0.12),phaseCol,0.8);
+  // glow behind phase text
+  glow(icesX+icesW/2,icesY+48,40,phaseCol,0.28);
+  t(phaseText,icesX+icesW/2,icesY+48,phaseCol,18,'800');
 
   // SOC % — very large, centered on fill area
   var socPct2=Math.round(st.soc*100);
+  // semi-transparent backdrop for contrast against shimmer fill
+  cx.save();
+  cx.fillStyle='rgba(6,12,24,0.55)';
+  cx.beginPath();
+  if(cx.roundRect){
+    cx.roundRect(X(icesX+icesW/2-38),Y(icesY+icesH/2-18),D(76),D(32),D(4));
+  } else {
+    cx.rect(X(icesX+icesW/2-38),Y(icesY+icesH/2-18),D(76),D(32));
+  }
+  cx.fill();
+  cx.restore();
   tm(socPct2+'%',icesX+icesW/2,icesY+icesH/2,'#ffffff',26,'700');
   t('STATE OF CHARGE',icesX+icesW/2,icesY+icesH/2+18,'#94a3b8',7,'600');
 
@@ -1258,9 +1354,18 @@ function drawAll(h,st,fW,fG,fC){
   t(phaseText,icesX+icesW/2,icesY+icesH-10,phaseCol,8,'700');
 
   // ── LEVEL 2: KPI panel — DC Live Status ──────────────────────
-  // Positioned below meter, spanning center-to-center
-  rr(200,8,155,72,6,'#060a14',C.sup,1.1);
-  t('DC LIVE STATUS',277,20,C.sup,9,'700');
+  // Positioned to left of meter with ≥14 unit gap
+  var kpiX=190, kpiY=8, kpiW=162, kpiH=72;
+  // Gradient fill for KPI panel
+  var kpiGrad=cx.createLinearGradient(X(kpiX),Y(kpiY),X(kpiX),Y(kpiY+kpiH));
+  kpiGrad.addColorStop(0,'rgba(56,189,248,0.06)');
+  kpiGrad.addColorStop(1,'rgba(6,10,20,1)');
+  cx.save(); cx.fillStyle=kpiGrad;
+  cx.beginPath(); if(cx.roundRect){cx.roundRect(X(kpiX),Y(kpiY),D(kpiW),D(kpiH),D(6));}else{cx.rect(X(kpiX),Y(kpiY),D(kpiW),D(kpiH));} cx.fill(); cx.restore();
+  rr(kpiX,kpiY,kpiW,kpiH,6,null,C.sup,1.1);
+  // left accent bar
+  cx.save(); cx.fillStyle=C.sup; cx.fillRect(X(kpiX),Y(kpiY+6),D(2),D(kpiH-12)); cx.restore();
+  t('DC LIVE STATUS',kpiX+kpiW/2,kpiY+12,C.sup,9,'700');
   var kpis=[
     {label:'IT LOAD',  val:itLoad.toFixed(1)+' MW', col:C.sup},
     {label:'CHILLER',  val:st.chEff.toFixed(1)+' MW',col:C.ret},
@@ -1268,13 +1373,21 @@ function drawAll(h,st,fW,fG,fC){
     {label:'FREED',    val:st.freed.toFixed(1)+' MW',col:C.cold}
   ];
   kpis.forEach(function(kpi,i){
-    var kx=204+i*37, ky=46;
-    rr(kx,ky-9,33,28,3,'#0a0e18',kpi.col,0.6);
-    t(kpi.label,kx+16.5,ky-2,'#2a3d5c',5.5,'700');
-    tm(kpi.val,kx+16.5,ky+9,kpi.col,8,'700');
+    var kx=kpiX+4+i*40, ky=46;
+    // tile gradient
+    var tileGrad=cx.createLinearGradient(X(kx),Y(ky-9),X(kx),Y(ky+19));
+    tileGrad.addColorStop(0,colA(kpi.col,0.10));
+    tileGrad.addColorStop(1,'rgba(10,14,24,1)');
+    cx.save(); cx.fillStyle=tileGrad;
+    cx.beginPath(); if(cx.roundRect){cx.roundRect(X(kx),Y(ky-9),D(36),D(28),D(3));}else{cx.rect(X(kx),Y(ky-9),D(36),D(28));} cx.fill(); cx.restore();
+    rr(kx,ky-9,36,28,3,null,kpi.col,0.6);
+    // 1px left accent
+    cx.save(); cx.fillStyle=kpi.col; cx.fillRect(X(kx),Y(ky-7),D(1.5),D(24)); cx.restore();
+    t(kpi.label,kx+18,ky-2,'#2a3d5c',5.5,'700');
+    tm(kpi.val,kx+18,ky+9,kpi.col,8,'700');
   });
-  // Meter bar
-  var bBar=204, yBar=69, wBar=148, hBar=6;
+  // Meter bar (inside KPI panel)
+  var bBar=kpiX+4, yBar=69, wBar=kpiW-8, hBar=6;
   cx.save();
   cx.beginPath(); cx.rect(X(bBar),Y(yBar),D(wBar),D(hBar)); cx.fillStyle='#0a0e18'; cx.fill();
   cx.fillStyle='rgba(56,189,248,0.38)';
@@ -1285,23 +1398,29 @@ function drawAll(h,st,fW,fG,fC){
     cx.fillStyle='rgba(96,165,250,0.55)';
     cx.fillRect(X(bBar+wBar*((itLoad+st.chEff)/CAP)),Y(yBar),D(wBar*(st.chargeKW/CAP)),D(hBar));
   }
-  cx.strokeStyle='#ef4444'; cx.lineWidth=D(1); cx.setLineDash([]);
+  cx.strokeStyle=C.ret; cx.lineWidth=D(1); cx.setLineDash([]);
   cx.beginPath(); cx.moveTo(X(bBar+wBar),Y(yBar-1)); cx.lineTo(X(bBar+wBar),Y(yBar+hBar+1)); cx.stroke();
   cx.restore();
-  t('cap 32',bBar+wBar+3,yBar+3,'#ef4444',6,'700','left');
+  t('cap 32',bBar+wBar+3,yBar+3,C.ret,6,'700','left');
 
-  // TES relief (right side of meter bar, Nostromo side)
-  rr(563,8,155,72,6,'#060a14',C.cold,1.1);
-  t('TES RELIEF',640,20,C.cold,9,'700');
+  // TES relief (right of meter, start at meterX+meterW+14)
+  var tesX=meterX+meterW+14, tesY=8, tesW=148, tesH=72;
+  var tesGrad2=cx.createLinearGradient(X(tesX),Y(tesY),X(tesX),Y(tesY+tesH));
+  tesGrad2.addColorStop(0,'rgba(52,211,153,0.06)');
+  tesGrad2.addColorStop(1,'rgba(6,10,20,1)');
+  cx.save(); cx.fillStyle=tesGrad2;
+  cx.beginPath(); if(cx.roundRect){cx.roundRect(X(tesX),Y(tesY),D(tesW),D(tesH),D(6));}else{cx.rect(X(tesX),Y(tesY),D(tesW),D(tesH));} cx.fill(); cx.restore();
+  rr(tesX,tesY,tesW,tesH,6,null,C.cold,1.1);
+  // right accent bar
+  cx.save(); cx.fillStyle=C.cold; cx.fillRect(X(tesX+tesW-2),Y(tesY+6),D(2),D(tesH-12)); cx.restore();
+  t('TES RELIEF',tesX+tesW/2,tesY+12,C.cold,9,'700');
   var tesOff=st.off.toFixed(1)+' MW';
-  tm(tesOff,640,44,st.discharging?C.cold:'#1e3050',18,'700');
-  t(st.discharging?'ACTIVE':'IDLE',640,62,st.discharging?C.cold:'#2a3d5c',8,'700');
+  tm(tesOff,tesX+tesW/2,tesY+40,st.discharging?C.cold:'#1e3050',18,'700');
+  t(st.discharging?'ACTIVE':'IDLE',tesX+tesW/2,tesY+60,st.discharging?C.cold:'#2a3d5c',8,'700');
 
-  // ── LEVEL 2: Temperature callouts on pipes ────────────────────
-  t('45°F',chBotX-15,(chBotY+dcTopY)/2,C.sup,8,'700');
-  t('70°F',dcRightX+15,(dcRightY+chRightY)/2,C.ret,8,'700');
-  t('32°F',(icesX+v1X)/2+10,icesPortColdY-8,C.cold,8,'700');
-  t('82°F',hxX+hxW+18,hxY+14,C.warm,8,'700');
+  // ── LEVEL 2: Temperature spot labels (near component ports) ──
+  // These are near component inlet/outlet — not on the pipe midpoints
+  pipeLabel('82°F HX IN',hxX+hxW+28,hxY+28,C.warm,aD*0.8);
 
   // ── LEVEL 3: Ambient temperature (subdued) ────────────────────
   cx.globalAlpha=0.5;
@@ -1310,22 +1429,25 @@ function drawAll(h,st,fW,fG,fC){
 
   // ── FOOTER / COLOR KEY ─────────────────────────────────────────
   var fkeys=[
-    {col:C.sup,label:'WATER SUPPLY'},
-    {col:C.ret,label:'WATER RETURN'},
-    {col:C.cold,label:'COLD GLYCOL'},
-    {col:C.warm,label:'WARM GLYCOL'},
-    {col:C.chg,label:'CHARGE LOOP'},
-    {col:'#fbbf24',label:'GRID POWER'},
+    {col:C.sup,  label:'WATER SUPPLY'},
+    {col:C.ret,  label:'WATER RETURN'},
+    {col:C.cold, label:'COLD GLYCOL'},
+    {col:C.warm, label:'WARM GLYCOL'},
+    {col:C.chg,  label:'CHARGE LOOP'},
+    {col:C.mix,  label:'CHW MIX'},
+    {col:C.warm, label:'GRID POWER'},
     {col:C.plate,label:'HX / PLATE'}
   ];
-  var fkStartX=12, fkY=543, fkSpacing=128;
+  // Replace GRID POWER swatch color with the actual yellow (warm is already #fbbf24)
+  fkeys[6].col='#fbbf24';
+  var fkStartX=12, fkY=543, fkSpacing=114;
   fkeys.forEach(function(fk,fi){
     var kx=fkStartX+fi*fkSpacing;
     cx.save();
     cx.fillStyle=fk.col;
-    cx.fillRect(X(kx),Y(fkY-2),D(18),D(4));
+    cx.fillRect(X(kx),Y(fkY-2),D(16),D(4));
     cx.restore();
-    t(fk.label,kx+22,fkY,fk.col,7.5,'600','left');
+    t(fk.label,kx+20,fkY,fk.col,7,'600','left');
   });
 }
 
