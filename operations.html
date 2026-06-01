@@ -446,20 +446,25 @@ function hxRect(x,y,w,h,alpha){
     cx.lineWidth=D(1.4);
     cx.stroke();
   });
-  t('PLATE HX',x+w/2,y-9,C.plate,8,'700');
-  t('HX',x+w/2,y+h/2-8,'#c7d2fe',9,'700');
-  t('water⇄glycol',x+w/2,y+h/2+8,'#5b6db8',6.5,'600');
-  // CHW / GLY fluid-side labels
+  t('PLATE HX · PHX-01',x+w/2,y-9,C.plate,8,'700');
+  t('PHX',x+w/2,y+h/2-8,'#c7d2fe',9,'700');
+  t('CHW ⇄ GLY',x+w/2,y+h/2+8,'#5b6db8',6.5,'600');
+  // CHW / GLY fluid-side labels with IN/OUT port annotations
   cx.globalAlpha=(alpha||1)*0.85;
-  cx.font='700 '+D(6)+'px "JetBrains Mono","Courier New",monospace';
+  cx.font='700 '+D(5.5)+'px "JetBrains Mono","Courier New",monospace';
   cx.textBaseline='top';
   cx.setLineDash([]);
   cx.textAlign='left';
-  cx.fillStyle='rgba(56,189,248,0.75)';
-  cx.fillText('CHW',X(x+4),Y(y+13));
+  cx.fillStyle='rgba(56,189,248,0.85)';
+  cx.fillText('CHW IN',X(x+4),Y(y+2));
+  cx.textBaseline='bottom';
+  cx.fillText('CHW OUT',X(x+4),Y(y+h-2));
+  cx.textBaseline='top';
   cx.textAlign='right';
-  cx.fillStyle='rgba(52,211,153,0.75)';
-  cx.fillText('GLY',X(x+w-4),Y(y+13));
+  cx.fillStyle='rgba(52,211,153,0.85)';
+  cx.fillText('GLY IN',X(x+w-4),Y(y+2));
+  cx.textBaseline='bottom';
+  cx.fillText('GLY OUT',X(x+w-4),Y(y+h-2));
   cx.restore();
 }
 
@@ -563,6 +568,40 @@ function drawMeterArc(x,y,r,val,mn,mx,tgt,cap,label){
   var va=a0+(fracVal)*(a1-a0);
   var col=val>=cap-0.5?C.ret:val>=tgt?C.warm:C.cold;
   cx.save();
+
+  // ── Outer ring with MW tick marks at 0, 8, 16, 24, 32 MW ────
+  var rOuter=r+6;
+  var tickMW=[0,8,16,24,32];
+  tickMW.forEach(function(mw){
+    var ta2=a0+((mw-mn)/(mx-mn))*(a1-a0);
+    var ang2=(ta2-90)*Math.PI/180;
+    var isMajor=mw===0||mw===32;
+    var tickLen=isMajor?4.5:3;
+    var r1=rOuter-tickLen, r2=rOuter+1;
+    cx.strokeStyle=mw===32?C.ret:mw>=24?C.warm:'#1e3a5f';
+    cx.lineWidth=D(isMajor?1.2:0.8);
+    cx.setLineDash([]);
+    cx.beginPath();
+    cx.moveTo(X(x+r1*Math.cos(ang2)),Y(y+r1*Math.sin(ang2)));
+    cx.lineTo(X(x+r2*Math.cos(ang2)),Y(y+r2*Math.sin(ang2)));
+    cx.stroke();
+    // tick value label
+    if(mw===0||mw===32||mw===16){
+      var labelR=rOuter+5;
+      var lx=x+labelR*Math.cos(ang2);
+      var ly=y+labelR*Math.sin(ang2);
+      tm(String(mw),lx,ly,mw===32?C.ret:'#1e3a5f',4.5,'700');
+    }
+  });
+  // outer ring arc (thin, decorative)
+  cx.strokeStyle='#1a2d4a';
+  cx.lineWidth=D(0.7);
+  cx.setLineDash([]);
+  cx.beginPath();
+  cx.arc(X(x),Y(y),D(rOuter),ra(a0),ra(a1));
+  cx.stroke();
+
+  // ── Main arc track ────────────────────────────────────────────
   cx.strokeStyle='#0d1a2a';
   cx.lineWidth=D(9);
   cx.lineCap='round';
@@ -717,7 +756,7 @@ function drawDLC(dcX,dcY,dcW,dcH){
 // ── graph draw function ───────────────────────────────────────
 function drawGraph(h,st){
   var W=gcv.width, H=gcv.height;
-  var marginL=36, marginR=12, marginT=14, marginB=22;
+  var marginL=36, marginR=12, marginT=14, marginB=28;
   var gW=W-marginL-marginR, gH=H-marginT-marginB;
   function gX(hour){ return marginL + (hour/24)*gW; }
   function gY(mw){ return marginT + gH - (mw/CAP)*gH; }
@@ -871,11 +910,12 @@ function drawGraph(h,st){
   gx.restore();
 
   // ── Layer 5: trigger zone callouts ───────────────────────────
+  // Two-line labels: line1 = event, line2 = reason
   var triggers=[
-    {hv:8,  col:'#60a5fa', lbl:'← charge ends'},
-    {hv:12, col:'#34d399', lbl:'discharge →'},
-    {hv:20, col:'#fbbf24', lbl:'peak ends →'},
-    {hv:22, col:'#60a5fa', lbl:'← charge'}
+    {hv:8,  col:'#60a5fa', lbl1:'off-peak', lbl2:'→ standby'},
+    {hv:12, col:'#34d399', lbl1:'peak demand', lbl2:'→ discharge'},
+    {hv:20, col:'#fbbf24', lbl1:'peak ends', lbl2:'→ recover'},
+    {hv:22, col:'#60a5fa', lbl1:'off-peak', lbl2:'→ charge'}
   ];
   gx.save();
   gx.font='700 6px "JetBrains Mono","Courier New",monospace';
@@ -893,7 +933,8 @@ function drawGraph(h,st){
     gx.globalAlpha=1;
     gx.fillStyle=tr.col;
     gx.textAlign='center';
-    gx.fillText(tr.lbl,tx,marginT+gH+13);
+    gx.fillText(tr.lbl1,tx,marginT+gH+4);
+    gx.fillText(tr.lbl2,tx,marginT+gH+12);
   });
   gx.restore();
 
@@ -972,14 +1013,20 @@ function drawAll(h,st,fW,fG,fC){
   // zone label with backdrop
   cx.save(); cx.fillStyle='rgba(8,12,20,0.70)';
   cx.beginPath(); if(cx.roundRect){cx.roundRect(X(100),Y(96),D(196),D(14),D(3));}else{cx.rect(X(100),Y(96),D(196),D(14));} cx.fill(); cx.restore();
-  t('◆  DATA CENTRE',198,103,'rgba(96,165,250,0.9)',9,'700');
+  cx.save(); cx.fillStyle='rgba(96,165,250,0.9)'; cx.font='700 '+D(9)+'px "Outfit","Segoe UI",system-ui,sans-serif';
+  if('letterSpacing' in cx) cx.letterSpacing=D(0.08)+'px';
+  cx.textAlign='center'; cx.textBaseline='middle';
+  cx.fillText('◆  DATA CENTRE',X(198),Y(103)); cx.restore();
 
   // Nostromo IceBrick zone (right)
   rr(530,90,382,440,10,'rgba(5,150,105,0.05)','rgba(52,211,153,0.2)',1.2);
   // zone label with backdrop
   cx.save(); cx.fillStyle='rgba(8,12,20,0.70)';
   cx.beginPath(); if(cx.roundRect){cx.roundRect(X(600),Y(96),D(242),D(14),D(3));}else{cx.rect(X(600),Y(96),D(242),D(14));} cx.fill(); cx.restore();
-  t('◆  NOSTROMO ICEBRICK SYSTEM',721,103,'rgba(52,211,153,0.9)',9,'700');
+  cx.save(); cx.fillStyle='rgba(52,211,153,0.9)'; cx.font='700 '+D(9)+'px "Outfit","Segoe UI",system-ui,sans-serif';
+  if('letterSpacing' in cx) cx.letterSpacing=D(0.08)+'px';
+  cx.textAlign='center'; cx.textBaseline='middle';
+  cx.fillText('◆  NOSTROMO ICEBRICK SYSTEM',X(721),Y(103)); cx.restore();
 
   // ── MAIN METER BOX (top center) ──────────────────────────────
   // Gradient fill for utility meter
@@ -1000,8 +1047,8 @@ function drawAll(h,st,fW,fG,fC){
   cx.globalAlpha=1; cx.restore();
   // 'UTIL GRID' micro-label just inside top of meter box
   t('↓ UTIL GRID',meterX+meterW/2,meterY+6,'rgba(251,191,36,0.55)',5.5,'600');
-  t('MAIN METER',meterX+meterW/2,meterY+11,'#93c5fd',11,'700');
-  t('SITE POWER · 32 MW CAP',meterX+meterW/2,meterY+23,'#1e3a5f',7,'600');
+  t('MAIN METER · M-01',meterX+meterW/2,meterY+11,'#93c5fd',11,'700');
+  t('SITE CAP: 32 MW',meterX+meterW/2,meterY+23,'#1e3a5f',7,'600');
   // Meter arc gauge (compact, fits in box)
   drawMeterArc(meterX+meterW/2,meterY+50,22,st.meter,0,CAP,31.5,CAP,'METER MW');
   // freed caption
@@ -1046,8 +1093,27 @@ function drawAll(h,st,fW,fG,fC){
 
   // ── PIPE ROUTING ─────────────────────────────────────────────
   var aW=0.85;
-  var aD=st.discharging?0.9:0.08;
-  var aC=st.charging?0.9:0.08;
+  // Smooth alpha ramps: linearly interpolate over ±rampW hours at each transition boundary
+  var rampW=0.25;
+  function softRamp(hh,low,high,edgeH,risingToHigh){
+    var d=hh-edgeH;
+    if(d<-rampW) return risingToHigh?low:high;
+    if(d> rampW) return risingToHigh?high:low;
+    var frac=(d+rampW)/(2*rampW);
+    return risingToHigh?low+(high-low)*frac:high+(low-high)*frac;
+  }
+  // Discharge: alpha rises at h=12, falls at h=20
+  var aD;
+  if(h<12-rampW||h>20+rampW){ aD=0.08; }
+  else if(h>=12-rampW&&h<=12+rampW){ aD=softRamp(h,0.08,0.9,12,true); }
+  else if(h>12+rampW&&h<20-rampW){ aD=0.9; }
+  else { aD=softRamp(h,0.08,0.9,20,false); }
+  // Charge: alpha is high when h<8 or h>=22, with ramps at boundaries
+  var aC;
+  if(h>8+rampW&&h<22-rampW){ aC=0.08; }
+  else if(h<=8+rampW&&h>=8-rampW){ aC=softRamp(h,0.08,0.9,8,false); }
+  else if(h>=22-rampW&&h<=22+rampW){ aC=softRamp(h,0.08,0.9,22,true); }
+  else { aC=0.9; }
 
   // Supply (chiller outlet → down left side → DC supply port)
   // Chiller bottom-left → runs down → into DC top-left
@@ -1099,9 +1165,11 @@ function drawAll(h,st,fW,fG,fC){
   var nchBotY=nchY+nchH;
   pipe([[nchBotX,nchBotY],[nchBotX,v1Y],[v1X+18,v1Y]],C.chg,3.5,fC,aC);
   arrow(nchBotX,(nchBotY+v1Y)/2,Math.PI/2,C.chg,4.5,aC);
-  // Warm return from IceBricks warm port → N.Chiller
-  pipe([[icesX,icesPortWarmY],[nchX+nchW,icesPortWarmY],[nchX+nchW,nchBotY-10],[nchBotX,nchBotY-10],[nchBotX,nchBotY]],C.warm,3,fC*0.85,aC*0.7);
-  arrow((icesX+nchX+nchW)/2,icesPortWarmY,Math.PI,C.warm,4.5,aC*0.7);
+  // Warm return from IceBricks warm port → N.Chiller (charge loop return, use chg orange-blue tint)
+  // Use a slightly warm-tinted chg color (lerpHex between chg and warm) to distinguish from discharge warm
+  var chgRetCol=lerpHex(C.chg,C.warm,0.35); // ~warm-blue blend
+  pipe([[icesX,icesPortWarmY+6],[nchX+nchW,icesPortWarmY+6],[nchX+nchW,nchBotY-10],[nchBotX,nchBotY-10],[nchBotX,nchBotY]],chgRetCol,3,fC*0.85,aC*0.7);
+  arrow((icesX+nchX+nchW)/2,icesPortWarmY+6,Math.PI,chgRetCol,4.5,aC*0.7);
 
   // ── FLOW DOTS ────────────────────────────────────────────────
   // Supply: chiller outlet → down left side → DC supply port
@@ -1118,8 +1186,8 @@ function drawAll(h,st,fW,fG,fC){
   flowDots([[hxX+hxW,hxY+14],[hxX+hxW,icesPortWarmY-10],[icesX,icesPortWarmY]],C.warm,fG,aD*0.8,3);
   // Charge loop: N.Chiller → V1 → IceBricks
   flowDots([[nchBotX,nchBotY],[nchBotX,v1Y],[v1X+18,v1Y]],C.chg,fC,aC,3);
-  // Warm return: IceBricks → N.Chiller
-  flowDots([[icesX,icesPortWarmY],[nchX+nchW,icesPortWarmY],[nchX+nchW,nchBotY-10],[nchBotX,nchBotY-10],[nchBotX,nchBotY]],C.warm,fC*0.85,aC*0.7,3);
+  // Warm return: IceBricks → N.Chiller (charge loop return)
+  flowDots([[icesX,icesPortWarmY+6],[nchX+nchW,icesPortWarmY+6],[nchX+nchW,nchBotY-10],[nchBotX,nchBotY-10],[nchBotX,nchBotY]],chgRetCol,fC*0.85,aC*0.7,3);
 
   // ── PIPE LABELS ──────────────────────────────────────────────
   // CHW supply midpoint: runs from chBotY down to dcTopY, on chBotX=38
@@ -1130,18 +1198,38 @@ function drawAll(h,st,fW,fG,fC){
   // Cold glycol from IceBricks: midpoint of [[icesX,icesPortColdY],[v1X,icesPortColdY]]
   pipeLabel('28°F GLY',(icesX+v1X)/2,icesPortColdY-11,C.cold,aD);
   // Warm glycol: midpoint of HX→IceBricks warm, at HX+hxW horizontal run
-  pipeLabel('38°F GLY',(hxX+hxW+icesX)/2,icesPortWarmY-11,C.warm,aD);
+  pipeLabel('38°F GLY RET',(hxX+hxW+icesX)/2,icesPortWarmY-11,C.warm,aD);
   // Charge loop: midpoint of nchBotX→v1Y vertical run
-  pipeLabel('CHG GLY',nchBotX+18,(nchBotY+v1Y)/2,C.chg,aC);
+  pipeLabel('30°F CHG GLY',nchBotX+18,(nchBotY+v1Y)/2,C.chg,aC);
 
-  // ── ISA INSTRUMENTS ──────────────────────────────────────────
-  // Level 3 — subdued
+  // ── ISA INSTRUMENTS (with leader lines to pipes) ─────────────
+  // FT-101: CHW supply pipe at chBotX (vertical pipe supply side)
+  // Instrument offset right of pipe, connected by leader
   cx.globalAlpha=0.5;
-  isa(chBotX-14,chBotY+22,'FT','101',C.sup,7);
-  isa(dcRightX+14,dcRightY-22,'FT','102',C.ret,7);
-  isa(hxX-14,hxY+hxH/2,'TT','201',C.cold,7);
-  isa(hxX+hxW+14,hxY+hxH/2,'PT','202',C.plate,7);
-  isa(v1X+24,v1Y-10,'TT','301',C.warm,7);
+  solidLine([[chBotX,chBotY+30],[chBotX-14,chBotY+30]],'#2a3d5c',0.7);
+  isa(chBotX-22,chBotY+30,'FT','101',C.sup,7);
+
+  // FT-102: CHW return pipe at dcRightX (vertical pipe return side)
+  solidLine([[dcRightX,dcRightY+22],[dcRightX+14,dcRightY+22]],'#2a3d5c',0.7);
+  isa(dcRightX+22,dcRightY+22,'FT','102',C.ret,7);
+
+  // TT-201: CHW supply entering HX left port (top-left port connection)
+  solidLine([[hxX,hxY+14],[hxX-14,hxY+14]],'#2a3d5c',0.7);
+  isa(hxX-22,hxY+14,'TT','201',C.sup,7);
+
+  // PT-301: glycol discharge pipe — V1 side (near IceBricks cold port)
+  solidLine([[(icesX+v1X)/2,icesPortColdY],[(icesX+v1X)/2,icesPortColdY-14]],'#2a3d5c',0.7);
+  isa((icesX+v1X)/2,icesPortColdY-22,'PT','301',C.cold,7);
+
+  // TT-401: warm glycol return — HX right top port
+  solidLine([[hxX+hxW,hxY+14],[hxX+hxW+14,hxY+14]],'#2a3d5c',0.7);
+  isa(hxX+hxW+22,hxY+14,'TT','401',C.warm,7);
+
+  // TT-501: charge loop — midpoint of vertical charge pipe
+  var chgMidY=(nchBotY+v1Y)/2;
+  solidLine([[nchBotX,chgMidY],[nchBotX+14,chgMidY]],'#2a3d5c',0.7);
+  isa(nchBotX+22,chgMidY,'TT','501',C.chg,7);
+
   cx.globalAlpha=1;
 
   // ── PUMPS ────────────────────────────────────────────────────
@@ -1159,8 +1247,8 @@ function drawAll(h,st,fW,fG,fC){
 
   // ── CHILLER ARRAY (left zone, upper) ─────────────────────────
   rr(chillerX,chillerY,chillerW,chillerH,6,'#060c18','#334155',1.2);
-  t('CHILLER ARRAY',chillerX+chillerW/2,chillerY+9,'#94a3b8',10,'700');
-  t('12 UNITS · N+1',chillerX+chillerW/2,chillerY+20,'#334155',7,'600');
+  t('CRAC-01–12',chillerX+chillerW/2,chillerY+9,'#94a3b8',10,'700');
+  t('CHILLER ARRAY · N+1',chillerX+chillerW/2,chillerY+20,'#334155',7,'600');
   var totalUnits=12;
   var onUnits=st.nRun;
   var relUnits=st.nRel;
@@ -1204,7 +1292,7 @@ function drawAll(h,st,fW,fG,fC){
       }
     }
   }
-  t('60°F SUPPLY',chillerX+chillerW/2,chillerY+chillerH-8,'#38bdf8',7,'700');
+  t('44°F / 6.7°C SUPPLY',chillerX+chillerW/2,chillerY+chillerH-8,'#38bdf8',7,'700');
 
   // ── COP READOUT (below chiller array right side) ──────────────
   var cop=Math.min(6.0,Math.max(2.5,itLoad/Math.max(0.1,st.chEff)));
@@ -1214,13 +1302,13 @@ function drawAll(h,st,fW,fG,fC){
   tm(cop.toFixed(2),copX+27,copY+21,C.cold,10,'700');
 
   // ── DATA CENTER (left zone, lower) ───────────────────────────
-  var dcLabel=coolingMode==='crah'?'CRAH UNITS · IT HALL A':'CDU + COLD PLATES · IT HALL A';
+  var dcLabel=coolingMode==='crah'?'CRAH · IT HALL A · 500kW/rack':'CDU · IT HALL A · 500kW/rack';
   rr(dcX,dcY,dcW,dcH,6,'#060c18','#334155',1.2);
   t(dcLabel,dcX+dcW/2,dcY+10,'#94a3b8',9,'700');
 
   if(coolingMode==='crah'){
     drawCRAH(dcX,dcY,dcW,dcH,C.sup);
-    t('60°F IN / 70°F OUT',dcX+dcW/2,dcY+dcH-8,'#475569',6.5,'600');
+    t('44°F IN / 56°F OUT',dcX+dcW/2,dcY+dcH-8,'#475569',6.5,'600');
   } else {
     drawDLC(dcX,dcY,dcW,dcH);
     t('CDU SECONDARY LOOP',dcX+dcW/2,dcY+dcH-8,'#475569',6.5,'600');
@@ -1229,7 +1317,7 @@ function drawAll(h,st,fW,fG,fC){
   // ── NOSTROMO GLYCOL CHILLER (right zone, upper) ───────────────
   if(st.charging) glow(nchX+nchW/2,nchY+nchH/2,55,C.chg,0.16);
   rr(nchX,nchY,nchW,nchH,6,'#060c18',st.charging?C.chg:'#1e3050',st.charging?1.8:1.2);
-  t('NOSTROMO CHILLER',nchX+nchW/2,nchY+13,'#a5b4fc',11,'700');
+  t('GLYCOL CHILLER GC-01',nchX+nchW/2,nchY+13,'#a5b4fc',10,'700');
   t(st.charging?'● CHARGING':'○ IDLE',nchX+nchW/2,nchY+26,st.charging?C.chg:'#2a3d5c',9,'700');
   // fan
   var fanCx=nchX+nchW/2, fanCy=nchY+55, fanR=18;
@@ -1254,8 +1342,23 @@ function drawAll(h,st,fW,fG,fC){
   var tesGlowCol=st.discharging?C.cold:st.charging?C.chg:'#334155';
   if(st.discharging||st.charging) glow(icesX+icesW/2,icesY+icesH/2,icesW*0.7,tesGlowCol,0.14);
   rr(icesX,icesY,icesW,icesH,6,'#060c18',tesGlowCol,1.4);
-  t('ICEBRICKS TES',icesX+icesW/2,icesY+12,'#5eead4',11,'700');
-  t('15 TRh CAPACITY',icesX+icesW/2,icesY+24,'#134e4a',7,'600');
+  // Metallic sheen: thin highlight on left wall edge
+  cx.save();
+  var sheenGrad=cx.createLinearGradient(X(icesX),Y(icesY+32),X(icesX+10),Y(icesY+32));
+  sheenGrad.addColorStop(0,'rgba(255,255,255,0.09)');
+  sheenGrad.addColorStop(0.5,'rgba(255,255,255,0.03)');
+  sheenGrad.addColorStop(1,'rgba(255,255,255,0)');
+  cx.fillStyle=sheenGrad;
+  cx.fillRect(X(icesX+1),Y(icesY+32),D(9),D(icesH-38));
+  // right edge shadow
+  var sheenGradR=cx.createLinearGradient(X(icesX+icesW-10),Y(icesY+32),X(icesX+icesW),Y(icesY+32));
+  sheenGradR.addColorStop(0,'rgba(0,0,0,0)');
+  sheenGradR.addColorStop(1,'rgba(0,0,0,0.18)');
+  cx.fillStyle=sheenGradR;
+  cx.fillRect(X(icesX+icesW-10),Y(icesY+32),D(9),D(icesH-38));
+  cx.restore();
+  t('ICEBRICKS TES · 32 TRh',icesX+icesW/2,icesY+12,'#5eead4',11,'700');
+  t('THERMAL ENERGY STORAGE',icesX+icesW/2,icesY+24,'#134e4a',7,'600');
 
   // level fill
   var fillH=st.soc*(icesH-38);
@@ -1420,7 +1523,7 @@ function drawAll(h,st,fW,fG,fC){
 
   // ── LEVEL 2: Temperature spot labels (near component ports) ──
   // These are near component inlet/outlet — not on the pipe midpoints
-  pipeLabel('82°F HX IN',hxX+hxW+28,hxY+28,C.warm,aD*0.8);
+  pipeLabel('38°F GLY OUT',hxX+hxW+28,hxY+28,C.warm,aD*0.8);
 
   // ── LEVEL 3: Ambient temperature (subdued) ────────────────────
   cx.globalAlpha=0.5;
@@ -1429,17 +1532,15 @@ function drawAll(h,st,fW,fG,fC){
 
   // ── FOOTER / COLOR KEY ─────────────────────────────────────────
   var fkeys=[
-    {col:C.sup,  label:'WATER SUPPLY'},
-    {col:C.ret,  label:'WATER RETURN'},
-    {col:C.cold, label:'COLD GLYCOL'},
-    {col:C.warm, label:'WARM GLYCOL'},
-    {col:C.chg,  label:'CHARGE LOOP'},
-    {col:C.mix,  label:'CHW MIX'},
-    {col:C.warm, label:'GRID POWER'},
-    {col:C.plate,label:'HX / PLATE'}
+    {col:C.sup,   label:'CHW SUPPLY'},
+    {col:C.ret,   label:'CHW RETURN'},
+    {col:C.cold,  label:'GLY COLD'},
+    {col:C.warm,  label:'GLY WARM'},
+    {col:C.chg,   label:'CHG LOOP'},
+    {col:C.mix,   label:'GLY MIX'},
+    {col:'#fbbf24',label:'GRID POWER'},
+    {col:C.plate, label:'HX PLATE'}
   ];
-  // Replace GRID POWER swatch color with the actual yellow (warm is already #fbbf24)
-  fkeys[6].col='#fbbf24';
   var fkStartX=12, fkY=543, fkSpacing=114;
   fkeys.forEach(function(fk,fi){
     var kx=fkStartX+fi*fkSpacing;
