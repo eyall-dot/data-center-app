@@ -25,7 +25,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:10px;heigh
 .tbtn:hover{background:#13203a}
 #playbtn{padding:4px 14px;background:#0b1e38;border:1px solid #1d4ed8;border-radius:6px;color:#60a5fa;font-size:10px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif}
 #playbtn:hover{background:#152d52}
-#graphbar{height:130px;background:#080c14;border-top:1px solid #14213a;flex-shrink:0;position:relative}
+#graphbar{height:150px;background:#080c14;border-top:1px solid #14213a;flex-shrink:0;position:relative}
 #gcv{display:block;width:100%;height:100%}
 #scenebar{height:32px;background:#080c14;border-top:1px solid #14213a;
   display:flex;align-items:center;gap:8px;padding:0 14px;flex-shrink:0}
@@ -754,231 +754,448 @@ function drawDLC(dcX,dcY,dcW,dcH){
   arrow((cduX+cduW+cpStartX)/2,cduY+cduH/2,0,C.chg,3.5,0.8);
 }
 
+// ── graph dirty flag + cached samples ────────────────────────
+var graphDirty=true, cachedSamples=[], cachedYMin=0, cachedYMax=CAP+0.5;
+
+function recomputeGraphSamples(){
+  cachedSamples=[];
+  for(var si=0;si<=96;si++){
+    var hh2=si*0.25;
+    var sv=state(hh2);
+    cachedSamples.push({h:hh2, meter:sv.meter});
+  }
+  var minMW=cachedSamples.reduce(function(a,s){return Math.min(a,s.meter);},99);
+  var maxMW=cachedSamples.reduce(function(a,s){return Math.max(a,s.meter);},0);
+  var yPad=(maxMW-minMW)*0.12;
+  cachedYMin=Math.max(0,minMW-yPad);
+  cachedYMax=maxMW+yPad;
+  if(CAP<=cachedYMax*1.2) cachedYMax=CAP+0.5;
+  graphDirty=false;
+}
+
 // ── graph draw function ───────────────────────────────────────
 function drawGraph(h,st){
+  if(graphDirty) recomputeGraphSamples();
+  var samples=cachedSamples;
+  var yMin=cachedYMin, yMax=cachedYMax;
+
   var W=gcv.width, H=gcv.height;
-  var marginL=36, marginR=12, marginT=14, marginB=28;
+  var marginL=42, marginR=16, marginT=18, marginB=32;
   var gW=W-marginL-marginR, gH=H-marginT-marginB;
   function gX(hour){ return marginL + (hour/24)*gW; }
-  function gY(mw){ return marginT + gH - (mw/CAP)*gH; }
+  function gY(mw){ return marginT + gH - ((mw-yMin)/(yMax-yMin))*gH; }
 
-  // clear
-  gx.clearRect(0,0,W,H);
+  // ── Layer 0: Background fill + vignette ──────────────────────
+  gx.fillStyle='#070b12';
+  gx.fillRect(0,0,W,H);
+  var vig=gx.createRadialGradient(W/2,H/2,0,W/2,H/2,Math.max(W,H)*0.7);
+  vig.addColorStop(0,'rgba(0,0,0,0)');
+  vig.addColorStop(1,'rgba(0,0,0,0.30)');
+  gx.fillStyle=vig;
+  gx.fillRect(0,0,W,H);
 
-  // ── Graph title ───────────────────────────────────────────────
+  // ── Layer 1: Window shading bands with soft edges ─────────────
+  function drawBand(hStart,hEnd,rgba){
+    var edgeW=0.5; // fade-in width in hours
+    // Build a horizontal gradient that fades in/out at edges
+    var x0=gX(hStart), x1=gX(hEnd);
+    var bandGrad=gx.createLinearGradient(x0,0,x1,0);
+    var edgeFrac=edgeW/(hEnd-hStart);
+    bandGrad.addColorStop(0,'rgba(0,0,0,0)');
+    bandGrad.addColorStop(Math.min(edgeFrac,0.45),rgba);
+    bandGrad.addColorStop(Math.max(1-edgeFrac,0.55),rgba);
+    bandGrad.addColorStop(1,'rgba(0,0,0,0)');
+    gx.fillStyle=bandGrad;
+    gx.fillRect(x0,marginT,x1-x0,gH);
+  }
+  // Charge: 0..8
+  drawBand(0,8,'rgba(96,165,250,0.06)');
+  // Charge: 22..24
+  drawBand(22,24,'rgba(96,165,250,0.06)');
+  // Discharge: 12..20
+  drawBand(12,20,'rgba(52,211,153,0.06)');
+  // Top cap lines on each band
   gx.save();
-  gx.fillStyle='#38bdf8';
-  gx.font='700 8px "JetBrains Mono","Courier New",monospace';
-  gx.textAlign='left';
-  gx.textBaseline='top';
-  gx.fillText('METER LOAD · 24h',marginL,2);
+  gx.lineWidth=1;
+  gx.setLineDash([]);
+  // charge bands top line
+  gx.strokeStyle='rgba(96,165,250,0.30)';
+  gx.beginPath(); gx.moveTo(gX(0),marginT+2); gx.lineTo(gX(8),marginT+2); gx.stroke();
+  gx.beginPath(); gx.moveTo(gX(22),marginT+2); gx.lineTo(gX(24),marginT+2); gx.stroke();
+  // discharge band top line
+  gx.strokeStyle='rgba(52,211,153,0.30)';
+  gx.beginPath(); gx.moveTo(gX(12),marginT+2); gx.lineTo(gX(20),marginT+2); gx.stroke();
   gx.restore();
 
-  // ── Layer 1: background window shading ───────────────────────
-  // Charge window: 0..8 and 22..24
-  gx.fillStyle='rgba(96,165,250,0.07)';
-  gx.fillRect(gX(0),marginT,gX(8)-gX(0),gH);
-  gx.fillRect(gX(22),marginT,gX(24)-gX(22),gH);
-  // Charge window label
-  gx.save();
-  gx.fillStyle='#60a5fa';
-  gx.font='700 7px "JetBrains Mono","Courier New",monospace';
-  gx.textAlign='left';
-  gx.textBaseline='top';
-  gx.fillText('CHARGE WINDOW',gX(0)+3,marginT+2);
-  gx.restore();
-  // Discharge window: 12..20
-  gx.fillStyle='rgba(52,211,153,0.07)';
-  gx.fillRect(gX(12),marginT,gX(20)-gX(12),gH);
-  // Discharge window label
-  gx.save();
-  gx.fillStyle='#34d399';
-  gx.font='700 7px "JetBrains Mono","Courier New",monospace';
-  gx.textAlign='left';
-  gx.textBaseline='top';
-  gx.fillText('DISCHARGE WINDOW',gX(12)+3,marginT+2);
-  gx.restore();
-
-  // ── Layer 2: grid lines ───────────────────────────────────────
-  // Horizontal dashed lines at 0, 10, 20, 32 MW
-  var gridMW=[0,10,20,32];
+  // ── Layer 2: Horizontal grid lines ───────────────────────────
+  // Compute clean Y tick step
+  var yRange=yMax-yMin;
+  var rawStep=yRange/4;
+  var step;
+  if(rawStep<=1) step=1;
+  else if(rawStep<=2.5) step=2;
+  else step=5;
+  // Build tick list
+  var yTicks=[];
+  var tickStart=Math.ceil(yMin/step)*step;
+  for(var ti=tickStart;ti<=yMax+0.001;ti+=step){
+    if(ti>=yMin-0.001) yTicks.push(parseFloat(ti.toFixed(2)));
+  }
   gx.save();
   gx.strokeStyle='#14213a';
   gx.lineWidth=0.5;
-  gx.setLineDash([3,3]);
+  gx.setLineDash([]);
   gx.font='400 7px "JetBrains Mono","Courier New",monospace';
   gx.fillStyle='#2a3d5c';
   gx.textAlign='right';
   gx.textBaseline='middle';
-  gridMW.forEach(function(mw){
-    var y=gY(mw);
+  yTicks.forEach(function(mw){
+    var gy=gY(mw);
+    if(gy<marginT||gy>marginT+gH+1) return;
     gx.beginPath();
-    gx.moveTo(gX(0),y);
-    gx.lineTo(gX(24),y);
+    gx.moveTo(marginL,gy);
+    gx.lineTo(marginL+gW,gy);
     gx.stroke();
-    gx.fillText(mw,marginL-3,y);
+    gx.fillText(mw.toFixed(1),marginL-4,gy);
   });
   gx.restore();
-  // Vertical tick marks every 2h
-  gx.save();
-  gx.strokeStyle='#14213a';
-  gx.lineWidth=0.5;
-  gx.setLineDash([]);
-  gx.font='400 7px "JetBrains Mono","Courier New",monospace';
-  gx.fillStyle='#2a3d5c';
-  gx.textAlign='center';
-  gx.textBaseline='top';
-  for(var th=0;th<=24;th+=2){
-    var tx=gX(th);
-    gx.beginPath();
-    gx.moveTo(tx,marginT+gH);
-    gx.lineTo(tx,marginT+gH+3);
-    gx.stroke();
-    gx.fillText(th+'h',tx,marginT+gH+5);
-  }
-  gx.restore();
 
-  // ── Layer 3: filled area chart (meter load) ───────────────────
-  var pts=[];
-  for(var si=0;si<=96;si++){
-    var hh=si/96*24;
-    pts.push({hh:hh,mw:state(hh).meter});
+  // ── Layer 3a: Phase fill under the curve (charge + discharge) ─
+  // Charge phase: 0..8
+  function phaseAreaFill(hA,hB,fillColor){
+    var seg=[];
+    for(var si2=0;si2<samples.length;si2++){
+      var sh=samples[si2].h;
+      if(sh>=hA-0.001&&sh<=hB+0.001) seg.push(samples[si2]);
+    }
+    if(seg.length<2) return;
+    gx.save();
+    gx.beginPath();
+    gx.moveTo(gX(seg[0].h),gY(seg[0].meter));
+    for(var si3=1;si3<seg.length;si3++){
+      var p0b=si3>1?seg[si3-2]:seg[si3-1];
+      var p1b=seg[si3-1];
+      var p2b=seg[si3];
+      var p3b=si3<seg.length-1?seg[si3+1]:p2b;
+      var cp1xb=gX(p1b.h+(p2b.h-p0b.h)/6);
+      var cp1yb=gY(p1b.meter+(p2b.meter-p0b.meter)/6);
+      var cp2xb=gX(p2b.h-(p3b.h-p1b.h)/6);
+      var cp2yb=gY(p2b.meter-(p3b.meter-p1b.meter)/6);
+      gx.bezierCurveTo(cp1xb,cp1yb,cp2xb,cp2yb,gX(p2b.h),gY(p2b.meter));
+    }
+    gx.lineTo(gX(hB),gY(yMin));
+    gx.lineTo(gX(hA),gY(yMin));
+    gx.closePath();
+    gx.fillStyle=fillColor;
+    gx.fill();
+    gx.restore();
   }
-  // filled area
+  phaseAreaFill(0,8,'rgba(96,165,250,0.10)');
+  phaseAreaFill(12,20,'rgba(52,211,153,0.10)');
+
+  // ── Layer 3b: Smooth filled area chart (Catmull-Rom) ─────────
   gx.save();
   var areaGrad=gx.createLinearGradient(0,marginT,0,marginT+gH);
-  areaGrad.addColorStop(0,'rgba(56,189,248,0.22)');
+  areaGrad.addColorStop(0,'rgba(56,189,248,0.28)');
   areaGrad.addColorStop(1,'rgba(56,189,248,0.04)');
   gx.fillStyle=areaGrad;
+
   gx.beginPath();
-  gx.moveTo(gX(0),gY(0));
-  pts.forEach(function(p){ gx.lineTo(gX(p.hh),gY(p.mw)); });
-  gx.lineTo(gX(24),gY(0));
+  gx.moveTo(gX(samples[0].h),gY(samples[0].meter));
+  for(var ci=0;ci<samples.length-1;ci++){
+    var p0=ci>0?samples[ci-1]:samples[ci];
+    var p1=samples[ci];
+    var p2=samples[ci+1];
+    var p3=ci<samples.length-2?samples[ci+2]:p2;
+    var cp1x=gX(p1.h+(p2.h-p0.h)/6);
+    var cp1y=gY(p1.meter+(p2.meter-p0.meter)/6);
+    var cp2x=gX(p2.h-(p3.h-p1.h)/6);
+    var cp2y=gY(p2.meter-(p3.meter-p1.meter)/6);
+    gx.bezierCurveTo(cp1x,cp1y,cp2x,cp2y,gX(p2.h),gY(p2.meter));
+  }
+  gx.lineTo(gX(24),gY(yMin));
+  gx.lineTo(gX(0),gY(yMin));
   gx.closePath();
   gx.fill();
-  // stroke top line
-  gx.strokeStyle='#38bdf8';
-  gx.lineWidth=1.5;
-  gx.setLineDash([]);
+
+  // Stroke the top curve
   gx.beginPath();
-  pts.forEach(function(p,i){
-    if(i===0) gx.moveTo(gX(p.hh),gY(p.mw));
-    else gx.lineTo(gX(p.hh),gY(p.mw));
-  });
+  gx.moveTo(gX(samples[0].h),gY(samples[0].meter));
+  for(var ci2=0;ci2<samples.length-1;ci2++){
+    var q0=ci2>0?samples[ci2-1]:samples[ci2];
+    var q1=samples[ci2];
+    var q2=samples[ci2+1];
+    var q3=ci2<samples.length-2?samples[ci2+2]:q2;
+    var qcp1x=gX(q1.h+(q2.h-q0.h)/6);
+    var qcp1y=gY(q1.meter+(q2.meter-q0.meter)/6);
+    var qcp2x=gX(q2.h-(q3.h-q1.h)/6);
+    var qcp2y=gY(q2.meter-(q3.meter-q1.meter)/6);
+    gx.bezierCurveTo(qcp1x,qcp1y,qcp2x,qcp2y,gX(q2.h),gY(q2.meter));
+  }
+  gx.strokeStyle='#38bdf8';
+  gx.lineWidth=1.8;
+  gx.setLineDash([]);
+  gx.shadowBlur=4;
+  gx.shadowColor='#38bdf8';
   gx.stroke();
+  gx.shadowBlur=0;
   gx.restore();
 
-  // ── Layer 4: reference lines ──────────────────────────────────
+  // ── Layer 4: Reference lines ──────────────────────────────────
   gx.save();
-  gx.font='700 7px "JetBrains Mono","Courier New",monospace';
+  gx.font='700 6.5px "JetBrains Mono","Courier New",monospace';
   gx.textBaseline='middle';
   gx.textAlign='left';
-  var labelX=gX(24)+2;
+  var refLabelX=marginL+gW+2;
+
+  function drawRefLine(mwVal,strokeCol,alpha,dash,labelTxt){
+    if(mwVal<yMin-0.1||mwVal>yMax+0.1) return;
+    var ry=gY(mwVal);
+    gx.save();
+    gx.globalAlpha=alpha;
+    gx.strokeStyle=strokeCol;
+    gx.lineWidth=0.8;
+    gx.setLineDash(dash);
+    gx.beginPath(); gx.moveTo(marginL,ry); gx.lineTo(marginL+gW,ry); gx.stroke();
+    gx.restore();
+    // label pill
+    gx.save();
+    gx.globalAlpha=1;
+    gx.font='700 6px "JetBrains Mono","Courier New",monospace';
+    var tw2=gx.measureText(labelTxt).width;
+    var pW=tw2+8, pH=10, pX=refLabelX, pY=ry-pH/2;
+    gx.fillStyle='rgba(7,11,18,0.90)';
+    gx.beginPath();
+    if(gx.roundRect) gx.roundRect(pX,pY,pW,pH,2);
+    else gx.rect(pX,pY,pW,pH);
+    gx.fill();
+    gx.strokeStyle=strokeCol; gx.lineWidth=0.8; gx.globalAlpha=0.6; gx.stroke();
+    gx.globalAlpha=1; gx.fillStyle=strokeCol;
+    gx.textAlign='left'; gx.textBaseline='middle';
+    gx.fillText(labelTxt,pX+4,ry);
+    gx.restore();
+  }
+
+  // Site cap
+  if(CAP>=yMin&&CAP<=yMax+1){
+    var capRy=gY(CAP);
+    gx.save();
+    gx.globalAlpha=0.7;
+    gx.strokeStyle=C.ret;
+    gx.lineWidth=1;
+    gx.setLineDash([]);
+    gx.beginPath(); gx.moveTo(marginL,capRy); gx.lineTo(marginL+gW,capRy); gx.stroke();
+    gx.restore();
+    gx.save();
+    gx.font='700 6px "JetBrains Mono","Courier New",monospace';
+    var capLbl='CAP 32 MW';
+    var ctw=gx.measureText(capLbl).width;
+    var cpW=ctw+8, cpH=10, cpX=refLabelX, cpY=capRy-cpH/2;
+    gx.fillStyle='rgba(7,11,18,0.90)'; gx.beginPath();
+    if(gx.roundRect) gx.roundRect(cpX,cpY,cpW,cpH,2); else gx.rect(cpX,cpY,cpW,cpH);
+    gx.fill(); gx.strokeStyle=C.ret; gx.lineWidth=0.8; gx.globalAlpha=0.6; gx.stroke();
+    gx.globalAlpha=1; gx.fillStyle=C.ret; gx.textAlign='left'; gx.textBaseline='middle';
+    gx.fillText(capLbl,cpX+4,capRy);
+    gx.restore();
+  }
   // IT load line
-  gx.globalAlpha=0.5;
-  gx.strokeStyle='#38bdf8';
-  gx.lineWidth=1;
-  gx.setLineDash([4,4]);
-  gx.beginPath();
-  gx.moveTo(gX(0),gY(itLoad));
-  gx.lineTo(gX(24),gY(itLoad));
-  gx.stroke();
-  gx.globalAlpha=1;
-  gx.fillStyle='#38bdf8';
-  gx.fillText('IT LOAD',labelX,gY(itLoad));
-  // Chiller minimum line (itLoad+3)
-  gx.globalAlpha=0.5;
-  gx.strokeStyle='#fbbf24';
-  gx.setLineDash([4,4]);
-  gx.beginPath();
-  gx.moveTo(gX(0),gY(itLoad+3));
-  gx.lineTo(gX(24),gY(itLoad+3));
-  gx.stroke();
-  gx.globalAlpha=1;
-  gx.fillStyle='#fbbf24';
-  gx.fillText('CHILL MIN',labelX,gY(itLoad+3));
-  // Site cap line (solid)
-  gx.globalAlpha=1;
-  gx.strokeStyle=C.ret;
-  gx.lineWidth=1;
-  gx.setLineDash([]);
-  gx.beginPath();
-  gx.moveTo(gX(0),gY(CAP));
-  gx.lineTo(gX(24),gY(CAP));
-  gx.stroke();
-  gx.fillStyle=C.ret;
-  gx.fillText('CAP 32',labelX,gY(CAP));
+  drawRefLine(itLoad,'#38bdf8',0.4,[4,3],'IT LOAD');
+  // Min load line (IT + 2.5 chiller floor)
+  drawRefLine(itLoad+2.5,'#fbbf24',0.4,[3,4],'MIN LOAD');
   gx.restore();
 
-  // ── Layer 5: trigger zone callouts ───────────────────────────
-  // Two-line labels: line1 = event, line2 = reason
-  var triggers=[
-    {hv:8,  col:'#60a5fa', lbl1:'off-peak', lbl2:'→ standby'},
-    {hv:12, col:'#34d399', lbl1:'peak demand', lbl2:'→ discharge'},
-    {hv:20, col:'#fbbf24', lbl1:'peak ends', lbl2:'→ recover'},
-    {hv:22, col:'#60a5fa', lbl1:'off-peak', lbl2:'→ charge'}
+  // ── Layer 5: Transition markers ───────────────────────────────
+  var transitions=[
+    {hv:8,  col:'#60a5fa', line1:'STANDBY',     line2:'charge complete · ambient rising'},
+    {hv:12, col:'#34d399', line1:'DISCHARGE ▶', line2:'peak demand · TES relief active'},
+    {hv:20, col:'#fbbf24', line1:'RECOVER',      line2:'peak passes · chiller takes over'},
+    {hv:22, col:'#60a5fa', line1:'◄ CHARGE', line2:'off-peak · efficient COP'}
   ];
+
+  // Pre-measure pills to avoid overlap — pills sit at top of graph
+  var pillInfos=[];
   gx.save();
-  gx.font='700 6px "JetBrains Mono","Courier New",monospace';
-  gx.textBaseline='top';
-  triggers.forEach(function(tr){
+  transitions.forEach(function(tr){
+    gx.font='700 7.5px "JetBrains Mono","Courier New",monospace';
+    var w1=gx.measureText(tr.line1).width;
+    gx.font='400 6px "Outfit","Segoe UI",sans-serif';
+    var w2=gx.measureText(tr.line2).width;
+    var pillW2=Math.max(Math.max(w1,w2)+14, 68);
+    var pillH2=22;
+    pillInfos.push({w:pillW2,h:pillH2});
+  });
+  gx.restore();
+
+  transitions.forEach(function(tr,ti){
     var tx=gX(tr.hv);
-    gx.globalAlpha=0.6;
+    var dotY=gY(state(tr.hv).meter);
+    var pInfo=pillInfos[ti];
+    var pillCX=tx;
+    // Clamp pill so it doesn't go outside the graph
+    var pillLeft=pillCX-pInfo.w/2;
+    var pillRight=pillCX+pInfo.w/2;
+    if(pillLeft<marginL) pillCX=marginL+pInfo.w/2;
+    if(pillRight>marginL+gW) pillCX=marginL+gW-pInfo.w/2;
+    var pillTop=marginT+8;
+
+    // 1. Vertical accent line
+    gx.save();
     gx.strokeStyle=tr.col;
     gx.lineWidth=1;
-    gx.setLineDash([3,3]);
+    gx.globalAlpha=0.5;
+    gx.setLineDash([2,3]);
     gx.beginPath();
     gx.moveTo(tx,marginT);
     gx.lineTo(tx,marginT+gH);
     gx.stroke();
-    gx.globalAlpha=1;
-    gx.fillStyle=tr.col;
-    gx.textAlign='center';
-    gx.fillText(tr.lbl1,tx,marginT+gH+4);
-    gx.fillText(tr.lbl2,tx,marginT+gH+12);
-  });
-  gx.restore();
+    gx.restore();
 
-  // ── Layer 6: now cursor ───────────────────────────────────────
+    // 2. Connector from dot up to pill bottom
+    var pillBottom=pillTop+pInfo.h;
+    if(dotY>pillBottom){
+      gx.save();
+      gx.strokeStyle=tr.col;
+      gx.lineWidth=0.7;
+      gx.globalAlpha=0.4;
+      gx.setLineDash([]);
+      gx.beginPath();
+      gx.moveTo(tx,dotY-5);
+      gx.lineTo(tx,pillBottom+1);
+      gx.stroke();
+      gx.restore();
+    }
+
+    // 3. Pill label
+    gx.save();
+    gx.fillStyle='rgba(7,11,18,0.92)';
+    gx.beginPath();
+    if(gx.roundRect) gx.roundRect(pillCX-pInfo.w/2,pillTop,pInfo.w,pInfo.h,3);
+    else gx.rect(pillCX-pInfo.w/2,pillTop,pInfo.w,pInfo.h);
+    gx.fill();
+    gx.strokeStyle=tr.col; gx.lineWidth=1; gx.globalAlpha=0.6; gx.stroke();
+    gx.globalAlpha=1;
+    // Line1 — bold mono
+    gx.font='700 7.5px "JetBrains Mono","Courier New",monospace';
+    gx.fillStyle=tr.col;
+    gx.textAlign='center'; gx.textBaseline='middle';
+    gx.fillText(tr.line1, pillCX, pillTop+7);
+    // Line2 — regular outfit
+    gx.font='400 6px "Outfit","Segoe UI",sans-serif';
+    gx.fillStyle='rgba(255,255,255,0.45)';
+    gx.fillText(tr.line2, pillCX, pillTop+16);
+    gx.restore();
+
+    // 4. Dot on curve
+    gx.save();
+    // Outer ring
+    gx.strokeStyle=tr.col; gx.lineWidth=1; gx.globalAlpha=0.6; gx.setLineDash([]);
+    gx.beginPath(); gx.arc(tx,dotY,5,0,Math.PI*2); gx.stroke();
+    // Inner dot
+    gx.globalAlpha=0.9; gx.fillStyle=tr.col;
+    gx.beginPath(); gx.arc(tx,dotY,3,0,Math.PI*2); gx.fill();
+    gx.restore();
+  });
+
+  // ── Layer 6: Now cursor ───────────────────────────────────────
   var nowX=gX(h);
   var nowY=gY(st.meter);
-  // vertical line
+  // Clamp nowY within graph area
+  nowY=Math.max(marginT,Math.min(marginT+gH,nowY));
+
+  // Vertical line
   gx.save();
-  gx.globalAlpha=0.7;
+  gx.globalAlpha=0.5;
   gx.strokeStyle='#ffffff';
-  gx.lineWidth=1;
+  gx.lineWidth=1.5;
   gx.setLineDash([]);
   gx.beginPath();
   gx.moveTo(nowX,marginT);
   gx.lineTo(nowX,marginT+gH);
   gx.stroke();
   gx.restore();
-  // circle at intersection
+
+  // Outer ring
   gx.save();
-  gx.globalAlpha=0.9;
-  gx.fillStyle='#ffffff';
-  gx.beginPath();
-  gx.arc(nowX,nowY,3,0,Math.PI*2);
-  gx.fill();
+  gx.globalAlpha=0.30;
+  gx.strokeStyle='#ffffff';
+  gx.lineWidth=1.5;
+  gx.beginPath(); gx.arc(nowX,nowY,6,0,Math.PI*2); gx.stroke();
   gx.restore();
-  // pill label above circle
+
+  // Inner dot
+  gx.save();
+  gx.globalAlpha=0.85;
+  gx.fillStyle='#ffffff';
+  gx.beginPath(); gx.arc(nowX,nowY,3,0,Math.PI*2); gx.fill();
+  gx.restore();
+
+  // Pill label
   var labelTxt=st.meter.toFixed(1)+' MW';
   gx.save();
-  gx.font='700 7px "JetBrains Mono","Courier New",monospace';
+  gx.font='700 8px "JetBrains Mono","Courier New",monospace';
   gx.textAlign='center';
-  gx.textBaseline='bottom';
+  gx.textBaseline='middle';
   var tw=gx.measureText(labelTxt).width;
-  var pillPad=4;
+  var pillPad=5;
   var pillW=tw+pillPad*2;
-  var pillH=11;
+  var pillH=13;
   var pillX=nowX-pillW/2;
-  var pillY=nowY-6-pillH;
-  gx.fillStyle='rgba(15,23,42,0.82)';
+  var pillY=Math.max(marginT+1, nowY-8-pillH);
+  // clamp horizontally
+  if(pillX<marginL) pillX=marginL;
+  if(pillX+pillW>marginL+gW) pillX=marginL+gW-pillW;
+  gx.fillStyle='rgba(7,11,18,0.95)';
   gx.beginPath();
-  gx.roundRect(pillX,pillY,pillW,pillH,4);
+  if(gx.roundRect) gx.roundRect(pillX,pillY,pillW,pillH,3);
+  else gx.rect(pillX,pillY,pillW,pillH);
   gx.fill();
+  gx.strokeStyle='rgba(255,255,255,0.40)'; gx.lineWidth=0.8; gx.stroke();
   gx.fillStyle='#ffffff';
-  gx.fillText(labelTxt,nowX,nowY-6);
+  gx.fillText(labelTxt, pillX+pillW/2, pillY+pillH/2);
+  gx.restore();
+
+  // ── Layer 7: Axes labels ──────────────────────────────────────
+  gx.save();
+  gx.font='400 7px "JetBrains Mono","Courier New",monospace';
+  gx.fillStyle='#2a3d5c';
+  gx.textAlign='center';
+  gx.textBaseline='top';
+  gx.strokeStyle='#2a3d5c';
+  gx.lineWidth=0.5;
+  gx.setLineDash([]);
+
+  // X axis ticks every 2h, labels only every 4h
+  for(var th=0;th<=24;th+=2){
+    var tx2=gX(th);
+    gx.beginPath();
+    gx.moveTo(tx2,marginT+gH);
+    gx.lineTo(tx2,marginT+gH+3);
+    gx.stroke();
+    if(th%4===0){
+      var hStr=String(th).padStart(2,'0')+':00';
+      gx.fillText(hStr,tx2,marginT+gH+5);
+    }
+  }
+  gx.restore();
+
+  // Graph title
+  gx.save();
+  gx.font='700 7.5px "Outfit","Segoe UI",sans-serif';
+  gx.fillStyle='#38bdf8';
+  gx.textAlign='left';
+  gx.textBaseline='top';
+  gx.fillText('SITE METER LOAD',marginL,2);
+  // subtitle
+  gx.font='400 6px "JetBrains Mono","Courier New",monospace';
+  gx.fillStyle='#2a3d5c';
+  var titleW=gx.measureText('SITE METER LOAD').width;
+  gx.font='400 6px "JetBrains Mono","Courier New",monospace';
+  // measure title width with correct font
+  gx.font='700 7.5px "Outfit","Segoe UI",sans-serif';
+  var tw3=gx.measureText('SITE METER LOAD').width;
+  gx.font='400 6px "JetBrains Mono","Courier New",monospace';
+  gx.fillStyle='#2a3d5c';
+  gx.fillText('MW / 24h', marginL+tw3+6, 3);
   gx.restore();
 }
 
@@ -1746,10 +1963,12 @@ var saEl=document.getElementById('sa');
 siEl.addEventListener('input',function(){
   itLoad=parseFloat(this.value);
   document.getElementById('li').textContent=itLoad.toFixed(1)+' MW';
+  graphDirty=true;
 });
 saEl.addEventListener('input',function(){
   ambientPeak=parseInt(this.value);
   document.getElementById('la').textContent=ambientPeak+'°F';
+  graphDirty=true;
 });
 
 // start playing after a brief pause
