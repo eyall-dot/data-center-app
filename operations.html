@@ -20,7 +20,7 @@ body{display:flex;flex-direction:column}
 input[type=range]{width:100%;-webkit-appearance:none;height:3px;border-radius:2px;background:#14213a;outline:none;cursor:pointer}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:10px;height:10px;border-radius:50%;background:#a78bfa;border:2px solid #080c14}
 #clock{font-size:14px;font-weight:700;color:#38bdf8;font-family:'JetBrains Mono','Courier New',monospace}
-#badge{padding:3px 12px;border-radius:12px;font-size:9px;font-weight:700;letter-spacing:.06em;background:#0d1117;border:1px solid #14213a;color:#14213a;transition:all .3s;white-space:nowrap;font-family:'Outfit',sans-serif}
+#badge{padding:4px 14px;border-radius:12px;font-size:10px;font-weight:700;letter-spacing:.06em;background:#0d1117;border:1px solid #14213a;color:#14213a;transition:all .3s;white-space:nowrap;font-family:'Outfit',sans-serif}
 .tbtn{padding:4px 10px;background:#0b1424;border:1px solid #1e3050;border-radius:6px;color:#5b7bb8;font-size:9px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif}
 .tbtn:hover{background:#13203a}
 #playbtn{padding:4px 14px;background:#0b1e38;border:1px solid #1d4ed8;border-radius:6px;color:#60a5fa;font-size:10px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif}
@@ -52,7 +52,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:10px;heigh
     <input type="range" id="scrub" min="0" max="9999" value="0"/>
     <span class="ph">24:00</span>
   </div>
-  <span id="clock">00:00</span>
+  <span style="border-right:1px solid #14213a;height:18px;display:inline-block"></span>
+  <span id="clock" style="border-left:2px solid #38bdf8;padding-left:10px;margin-left:4px">00:00</span>
   <span id="badge">STANDBY</span>
   <button class="tbtn" id="s1btn">1×</button>
   <button class="tbtn" id="s2btn" style="color:#a78bfa;border-color:#3b2a6a">2×</button>
@@ -988,8 +989,8 @@ function drawAll(h,st,fW,fG,fC){
   cx.fillRect(0,0,cv.width,cv.height);
 
   // ── COMPONENT POSITIONS ──────────────────────────────────────
-  // Main Meter: top-center (shifted right to clear KPI panel)
-  var meterX=368, meterY=8, meterW=188, meterH=72;
+  // Main Meter: top-center (slightly wider to anchor diagram)
+  var meterX=362, meterY=8, meterW=196, meterH=72;
   // Chiller Array: left zone upper
   var chillerX=18, chillerY=100, chillerW=160, chillerH=88;
   // Data Center: left zone lower
@@ -1008,34 +1009,40 @@ function drawAll(h,st,fW,fG,fC){
   // Interface / neutral zone (drawn first so zones paint over edges)
   rr(390,90,138,440,8,'rgba(148,163,184,0.025)','rgba(148,163,184,0.10)',0.8);
 
-  // Data Centre zone (left)
+  // Data Centre zone (left) — outer border + inner halo
   rr(8,90,380,440,10,'rgba(30,58,138,0.05)','rgba(59,130,246,0.22)',1.2);
+  rr(10,92,376,436,9,null,'rgba(59,130,246,0.07)',3);
   // zone label with backdrop
   cx.save(); cx.fillStyle='rgba(8,12,20,0.70)';
   cx.beginPath(); if(cx.roundRect){cx.roundRect(X(100),Y(96),D(196),D(14),D(3));}else{cx.rect(X(100),Y(96),D(196),D(14));} cx.fill(); cx.restore();
-  cx.save(); cx.fillStyle='rgba(96,165,250,0.9)'; cx.font='700 '+D(9)+'px "Outfit","Segoe UI",system-ui,sans-serif';
+  cx.save(); cx.fillStyle='rgba(96,165,250,0.9)'; cx.font='700 '+D(10)+'px "Outfit","Segoe UI",system-ui,sans-serif';
   if('letterSpacing' in cx) cx.letterSpacing=D(0.08)+'px';
   cx.textAlign='center'; cx.textBaseline='middle';
   cx.fillText('◆  DATA CENTRE',X(198),Y(103)); cx.restore();
 
-  // Nostromo IceBrick zone (right)
+  // Nostromo IceBrick zone (right) — outer border + inner halo
   rr(530,90,382,440,10,'rgba(5,150,105,0.05)','rgba(52,211,153,0.2)',1.2);
+  rr(532,92,378,436,9,null,'rgba(52,211,153,0.07)',3);
   // zone label with backdrop
   cx.save(); cx.fillStyle='rgba(8,12,20,0.70)';
   cx.beginPath(); if(cx.roundRect){cx.roundRect(X(600),Y(96),D(242),D(14),D(3));}else{cx.rect(X(600),Y(96),D(242),D(14));} cx.fill(); cx.restore();
-  cx.save(); cx.fillStyle='rgba(52,211,153,0.9)'; cx.font='700 '+D(9)+'px "Outfit","Segoe UI",system-ui,sans-serif';
+  cx.save(); cx.fillStyle='rgba(52,211,153,0.9)'; cx.font='700 '+D(10)+'px "Outfit","Segoe UI",system-ui,sans-serif';
   if('letterSpacing' in cx) cx.letterSpacing=D(0.08)+'px';
   cx.textAlign='center'; cx.textBaseline='middle';
   cx.fillText('◆  NOSTROMO ICEBRICK SYSTEM',X(721),Y(103)); cx.restore();
 
   // ── MAIN METER BOX (top center) ──────────────────────────────
+  // Outer glow behind meter box to anchor the diagram
+  glow(meterX+meterW/2,meterY+meterH/2,meterW*0.65,'#1d4ed8',0.22);
   // Gradient fill for utility meter
   var meterGrad=cx.createLinearGradient(X(meterX),Y(meterY),X(meterX),Y(meterY+meterH));
-  meterGrad.addColorStop(0,'rgba(29,78,216,0.08)');
+  meterGrad.addColorStop(0,'rgba(29,78,216,0.12)');
   meterGrad.addColorStop(1,'rgba(6,12,24,1)');
   cx.save(); cx.fillStyle=meterGrad;
   cx.beginPath(); if(cx.roundRect){cx.roundRect(X(meterX),Y(meterY),D(meterW),D(meterH),D(6));}else{cx.rect(X(meterX),Y(meterY),D(meterW),D(meterH));} cx.fill(); cx.restore();
-  rr(meterX,meterY,meterW,meterH,6,null,'#1d4ed8',1.6);
+  rr(meterX,meterY,meterW,meterH,6,null,'#2563eb',2.0);
+  // thin inner halo on meter box
+  rr(meterX+1,meterY+1,meterW-2,meterH-2,5,null,'rgba(96,165,250,0.12)',2);
   // Utility grid entry line — thin dashed vertical entering from top of meter box
   cx.save();
   cx.strokeStyle='#fbbf24'; cx.lineWidth=D(2); cx.globalAlpha=0.55;
@@ -1057,39 +1064,44 @@ function drawAll(h,st,fW,fG,fC){
   }
 
   // ── ELECTRICAL LINES FROM METER ──────────────────────────────
-  // Meter bottom-left corner → left zone (feeds chiller + DC)
+  // Meter bottom center → branch point → left zone (feeds chiller + DC)
   var mBotX=meterX+meterW/2;
   var mBotY=meterY+meterH;
-  // Elbow left toward DC zone
+  var branchY=mBotY+10;
+  // Elbow left toward DC zone — thicker, more authoritative
   cx.save();
   cx.strokeStyle='#fbbf24';
-  cx.lineWidth=D(2);
-  cx.globalAlpha=0.55;
+  cx.lineWidth=D(2.8);
+  cx.globalAlpha=0.70;
   cx.setLineDash([D(5),D(3)]);
   cx.beginPath();
   cx.moveTo(X(mBotX),Y(mBotY));
-  cx.lineTo(X(mBotX-50),Y(mBotY+10));
-  cx.lineTo(X(98),Y(mBotY+10));
+  cx.lineTo(X(mBotX-50),Y(branchY));
+  cx.lineTo(X(98),Y(branchY));
   cx.lineTo(X(98),Y(chillerY));
   cx.stroke();
   cx.restore();
-  t('⚡',mBotX-25,mBotY+6,'#fbbf24',8,'700');
+  // bolt symbol at branch point
+  t('⚡',mBotX,mBotY+2,'#fbbf24',9,'700');
+  // arrowhead at DC zone entry (C4)
+  arrow(98,chillerY+4,Math.PI/2,'#fbbf24',4.5,0.70);
 
-  // Elbow right toward Nostromo zone (charge-only)
+  // Elbow right toward Nostromo zone (charge-only) — thicker when charging
   cx.save();
   cx.strokeStyle=C.chg;
-  cx.lineWidth=D(2.2);
-  cx.globalAlpha=st.charging?0.88:0.12;
+  cx.lineWidth=D(2.8);
+  cx.globalAlpha=st.charging?0.90:0.13;
   cx.setLineDash([D(6),D(4)]);
   cx.lineDashOffset=-(fC*0.4);
   cx.beginPath();
   cx.moveTo(X(mBotX),Y(mBotY));
-  cx.lineTo(X(mBotX+50),Y(mBotY+10));
-  cx.lineTo(X(nchX+nchW/2),Y(mBotY+10));
+  cx.lineTo(X(mBotX+50),Y(branchY));
+  cx.lineTo(X(nchX+nchW/2),Y(branchY));
   cx.lineTo(X(nchX+nchW/2),Y(nchY));
   cx.stroke();
   cx.restore();
-  if(st.charging) t('⚡',mBotX+30,mBotY+5,C.chg,8,'700');
+  // arrowhead at Nostromo chiller entry (C4)
+  if(st.charging) arrow(nchX+nchW/2,nchY+4,Math.PI/2,C.chg,4.5,0.90);
 
   // ── PIPE ROUTING ─────────────────────────────────────────────
   var aW=0.85;
@@ -1203,17 +1215,16 @@ function drawAll(h,st,fW,fG,fC){
   pipeLabel('30°F CHG GLY',nchBotX+18,(nchBotY+v1Y)/2,C.chg,aC);
 
   // ── ISA INSTRUMENTS (with leader lines to pipes) ─────────────
-  // FT-101: CHW supply pipe at chBotX (vertical pipe supply side)
-  // Instrument offset right of pipe, connected by leader
+  // FT-101: CHW supply pipe — leader goes RIGHT to avoid left zone border
   cx.globalAlpha=0.5;
-  solidLine([[chBotX,chBotY+30],[chBotX-14,chBotY+30]],'#2a3d5c',0.7);
-  isa(chBotX-22,chBotY+30,'FT','101',C.sup,7);
+  solidLine([[chBotX,chBotY+30],[chBotX+14,chBotY+30]],'#2a3d5c',0.7);
+  isa(chBotX+22,chBotY+30,'FT','101',C.sup,7);
 
   // FT-102: CHW return pipe at dcRightX (vertical pipe return side)
   solidLine([[dcRightX,dcRightY+22],[dcRightX+14,dcRightY+22]],'#2a3d5c',0.7);
   isa(dcRightX+22,dcRightY+22,'FT','102',C.ret,7);
 
-  // TT-201: CHW supply entering HX left port (top-left port connection)
+  // TT-201: CHW supply entering HX left port — leader goes left (safe, inside DC zone)
   solidLine([[hxX,hxY+14],[hxX-14,hxY+14]],'#2a3d5c',0.7);
   isa(hxX-22,hxY+14,'TT','201',C.sup,7);
 
@@ -1221,9 +1232,10 @@ function drawAll(h,st,fW,fG,fC){
   solidLine([[(icesX+v1X)/2,icesPortColdY],[(icesX+v1X)/2,icesPortColdY-14]],'#2a3d5c',0.7);
   isa((icesX+v1X)/2,icesPortColdY-22,'PT','301',C.cold,7);
 
-  // TT-401: warm glycol return — HX right top port
-  solidLine([[hxX+hxW,hxY+14],[hxX+hxW+14,hxY+14]],'#2a3d5c',0.7);
-  isa(hxX+hxW+22,hxY+14,'TT','401',C.warm,7);
+  // TT-401: warm glycol return — attached to the warm glycol descending pipe, leader goes right
+  // ISA center at x=551 → leftmost edge 544, Nostromo border at 530 → 14px clearance
+  solidLine([[hxX+hxW,hxY+50],[hxX+hxW+32,hxY+50]],'#2a3d5c',0.7);
+  isa(hxX+hxW+32+9,hxY+50,'TT','401',C.warm,7);
 
   // TT-501: charge loop — midpoint of vertical charge pipe
   var chgMidY=(nchBotY+v1Y)/2;
@@ -1236,6 +1248,28 @@ function drawAll(h,st,fW,fG,fC){
   pump(chBotX,chBotY+8,9,'P1','','270');
   pump(dcRightX,dcY-8,9,'P2','','90');
   pump(nchBotX,nchBotY+8,9,'P4','','270');
+  // C2: Flow rate readouts below each pump label
+  // P1 — CHW supply pump (active when supply loop on = always aW)
+  tm(aW>0.5?'100%':'---',chBotX,chBotY+8+9+24,aW>0.5?C.sup:'#1e3050',5,'700');
+  // P2 — CHW return pump (mirrors P1)
+  tm(aW>0.5?'100%':'---',dcRightX,dcY-8+9+24,aW>0.5?C.ret:'#1e3050',5,'700');
+  // P4 — glycol charge pump (active when charging)
+  tm(aC>0.5?'100%':'0%',nchBotX,nchBotY+8+9+24,aC>0.5?C.chg:'#1e3050',5,'700');
+
+  // ── THERMAL INTERFACE ZONE — centerline + label (B4) ─────────
+  cx.save();
+  cx.globalAlpha=0.22;
+  cx.strokeStyle='#94a3b8';
+  cx.lineWidth=D(0.6);
+  cx.setLineDash([D(4),D(4)]);
+  cx.beginPath();
+  cx.moveTo(X(459),Y(96));
+  cx.lineTo(X(459),Y(530));
+  cx.stroke();
+  cx.restore();
+  // 'HX STATION' label above HX
+  rr(416,194,86,13,3,'rgba(8,12,20,0.82)','rgba(148,163,184,0.25)',0.7);
+  t('HX STATION',459,200,'#94a3b8',7.5,'700');
 
   // ── HX ───────────────────────────────────────────────────────
   hxRect(hxX,hxY,hxW,hxH,1);
@@ -1506,8 +1540,8 @@ function drawAll(h,st,fW,fG,fC){
   cx.restore();
   t('cap 32',bBar+wBar+3,yBar+3,C.ret,6,'700','left');
 
-  // TES relief (right of meter, start at meterX+meterW+14)
-  var tesX=meterX+meterW+14, tesY=8, tesW=148, tesH=72;
+  // TES relief (right of meter, sized so right edge ≤688 — 12px gap before IceBricks at 700)
+  var tesX=meterX+meterW+14, tesY=8, tesW=116, tesH=72;
   var tesGrad2=cx.createLinearGradient(X(tesX),Y(tesY),X(tesX),Y(tesY+tesH));
   tesGrad2.addColorStop(0,'rgba(52,211,153,0.06)');
   tesGrad2.addColorStop(1,'rgba(6,10,20,1)');
@@ -1525,9 +1559,87 @@ function drawAll(h,st,fW,fG,fC){
   // These are near component inlet/outlet — not on the pipe midpoints
   pipeLabel('38°F GLY OUT',hxX+hxW+28,hxY+28,C.warm,aD*0.8);
 
-  // ── LEVEL 3: Ambient temperature (subdued) ────────────────────
-  cx.globalAlpha=0.5;
-  t(Math.round(st.T)+'°F AMB',460,78,C.warm,7.5,'600');
+  // ── C3: Efficiency banner (full-width thin rule + pill) ──────
+  // thin horizontal rule across canvas
+  cx.save();
+  cx.globalAlpha=0.35;
+  cx.strokeStyle='#14213a';
+  cx.lineWidth=D(0.7);
+  cx.setLineDash([]);
+  cx.beginPath();
+  cx.moveTo(X(0),Y(83));
+  cx.lineTo(X(VW),Y(83));
+  cx.stroke();
+  cx.restore();
+  // pill background
+  var pue=(1+st.chEff/itLoad).toFixed(2);
+  var freed2=st.freed.toFixed(1);
+  var tesP=Math.round(st.soc*100);
+  var pillTxt1='SITE EFFICIENCY  ·  PUE: ';
+  var pillTxt2=pue;
+  var pillTxt3='  ·  FREED: ';
+  var pillTxt4=freed2+' MW';
+  var pillTxt5='  ·  TES: ';
+  var pillTxt6=tesP+'%';
+  var effCx=460, effCy=83;
+  cx.save();
+  var fs6=D(6);
+  // measure total width by summing each segment with its own font
+  var seg=[
+    {txt:pillTxt1,col:'#4a6680',mono:false},
+    {txt:pillTxt2,col:C.cmd,mono:true},
+    {txt:pillTxt3,col:'#4a6680',mono:false},
+    {txt:pillTxt4,col:C.cold,mono:true},
+    {txt:pillTxt5,col:'#4a6680',mono:false},
+    {txt:pillTxt6,col:C.chg,mono:true}
+  ];
+  var totalW=0;
+  seg.forEach(function(s){
+    cx.font='700 '+fs6+'px "'+(s.mono?'JetBrains Mono","Courier New",monospace':'Outfit","Segoe UI",system-ui,sans-serif"');
+    totalW+=cx.measureText(s.txt).width;
+  });
+  var epX=X(effCx)-totalW/2-D(10), epY=Y(effCy)-D(5);
+  cx.beginPath();
+  if(cx.roundRect){cx.roundRect(epX,epY,totalW+D(20),D(10),D(3));}
+  else{cx.rect(epX,epY,totalW+D(20),D(10));}
+  cx.fillStyle='rgba(8,12,20,0.90)';
+  cx.fill();
+  cx.strokeStyle='#1e3a5f'; cx.lineWidth=D(0.7); cx.setLineDash([]); cx.stroke();
+  // draw segments
+  cx.textAlign='left'; cx.textBaseline='middle';
+  var curX=epX+D(10);
+  seg.forEach(function(s){
+    cx.font='700 '+fs6+'px "'+(s.mono?'JetBrains Mono","Courier New",monospace':'Outfit","Segoe UI",system-ui,sans-serif"');
+    cx.fillStyle=s.col;
+    cx.fillText(s.txt,curX,Y(effCy));
+    curX+=cx.measureText(s.txt).width;
+  });
+  cx.restore();
+
+  // ── C1: Ambient temperature display (top-right corner) ───────
+  var ambX=870, ambY=22;
+  // label 'AMBIENT'
+  t('AMBIENT',ambX,ambY-7,'#2a3d5c',6,'600');
+  // thermometer icon: vertical rectangle + circle at bottom
+  var thX=ambX-18, thY=ambY-4, thW=5, thH=14;
+  var tFrac=Math.max(0,Math.min(1,(st.T-64)/(ambientPeak-64)));
+  var tCol=lerpHex(C.sup,C.ret,tFrac);
+  cx.save();
+  cx.strokeStyle=tCol; cx.lineWidth=D(0.8); cx.setLineDash([]);
+  cx.beginPath();
+  if(cx.roundRect){cx.roundRect(X(thX),Y(thY),D(thW),D(thH),D(2));}
+  else{cx.rect(X(thX),Y(thY),D(thW),D(thH));}
+  cx.fillStyle='rgba(8,12,20,0.8)'; cx.fill(); cx.stroke();
+  // fill level
+  var fillFracH=thH*tFrac;
+  cx.fillStyle=colA(tCol,0.7);
+  cx.fillRect(X(thX+1),Y(thY+thH-fillFracH-1),D(thW-2),D(fillFracH));
+  // bulb circle at bottom
+  cx.beginPath(); cx.arc(X(thX+thW/2),Y(thY+thH+2),D(3.5),0,Math.PI*2);
+  cx.fillStyle=tCol; cx.fill();
+  cx.restore();
+  // temperature value
+  tm(Math.round(st.T)+'°F',ambX,ambY,tCol,14,'700');
   cx.globalAlpha=1;
 
   // ── FOOTER / COLOR KEY ─────────────────────────────────────────
